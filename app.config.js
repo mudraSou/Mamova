@@ -1,0 +1,49 @@
+// app.config.js — replaces app.json. Expo 49+ loads .env automatically.
+export default {
+  expo: {
+    name: 'Mamova',
+    slug: 'mamova',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'automatic',
+    scheme: 'mamova',
+    splash: {
+      image: './assets/splash.png',
+      resizeMode: 'contain',
+      backgroundColor: '#1a1133',
+    },
+    assetBundlePatterns: ['**/*'],
+    ios: {
+      supportsTablet: false,
+      bundleIdentifier: 'com.mamova.app',
+      infoPlist: {
+        NSCameraUsageDescription: 'Used for profile photo',
+      },
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#1a1133',
+      },
+      package: 'com.mamova.app',
+      softwareKeyboardLayoutMode: 'pan',
+    },
+    web: {
+      favicon: './assets/favicon.png',
+      bundler: 'metro',
+    },
+    plugins: [
+      'expo-router',
+      'expo-font',
+      ['expo-splash-screen', { backgroundColor: '#1a1133', image: './assets/splash.png' }],
+    ],
+    experiments: {
+      typedRoutes: true,
+    },
+    extra: {
+      geminiApiKey: process.env.GEMINI_API_KEY ?? '',
+      groqApiKey:   process.env.GROQ_API_KEY   ?? '',
+    },
+  },
+};

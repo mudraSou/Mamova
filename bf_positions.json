@@ -1,0 +1,337 @@
+[
+  {
+    "id": 1,
+    "slug": "cradle-hold",
+    "title": "Cradle Hold",
+    "tagline": "The classic position most mothers start with",
+    "icon": "child_care",
+    "best_for": ["Most mothers", "Newborns", "Older babies"],
+    "not_ideal_for": ["C-section recovery (first week)", "Flat or inverted nipples"],
+    "difficulty": "beginner",
+    "steps": [
+      {
+        "order": 1,
+        "title": "Sit up and support your back",
+        "instruction": "Sit upright in a supportive chair or propped up in bed. Place a pillow behind your lower back. Let your shoulders drop — do not hunch forward.",
+        "tip": "A nursing pillow across your lap raises the baby to nipple height and saves your arms."
+      },
+      {
+        "order": 2,
+        "title": "Cradle baby's head in your elbow crook",
+        "instruction": "Rest the baby's head in the bend of your elbow on the same side as the breast you're using. Baby's body faces yours — tummy to tummy — not the ceiling.",
+        "tip": "Baby's ear, shoulder, and hip should form a straight line."
+      },
+      {
+        "order": 3,
+        "title": "Support baby's back and bottom",
+        "instruction": "Use your forearm to support baby's back, and your hand to cup the bottom. Keep baby level — head not lower than the body.",
+        "tip": null
+      },
+      {
+        "order": 4,
+        "title": "Bring baby to your breast",
+        "instruction": "Move baby to your breast — not your breast down to baby. Aim baby's nose toward your nipple so the head tilts back slightly and the chin leads to the breast first.",
+        "tip": "Chin touching first opens the mouth wider for a deeper latch."
+      },
+      {
+        "order": 5,
+        "title": "Wait for a wide-open mouth, then latch",
+        "instruction": "Wait for baby to open the mouth wide like a yawn. Then quickly bring baby onto the breast — don't push the head. The mouth should cover the nipple and a good portion of the areola below it.",
+        "tip": null
+      }
+    ],
+    "latch_checklist": [
+      "Baby's mouth is wide open — like a yawn",
+      "More areola visible above the top lip than below",
+      "Baby's chin is touching your breast",
+      "Baby's lips are flanged out (not tucked in)",
+      "You feel strong tugging — not pinching or sharp pain",
+      "Baby's ears wiggle with each swallow"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Leaning your breast down to the baby",
+        "fix": "Bring baby UP to your breast using a pillow — not the other way around. Hunching causes back and neck pain fast."
+      },
+      {
+        "mistake": "Baby's body facing the ceiling instead of your body",
+        "fix": "Rotate baby so tummy faces your tummy throughout the feed."
+      },
+      {
+        "mistake": "Holding the back of baby's head and pushing",
+        "fix": "Support the neck, not the skull. Pushing the head causes the baby to arch away."
+      }
+    ],
+    "disclaimer": "This information is for general guidance only and is not a substitute for professional lactation support. If you experience persistent pain, poor weight gain in your baby, or any concerns, contact a certified lactation consultant (IBCLC) or your healthcare provider.",
+    "reviewed_by_id": null,
+    "last_reviewed_at": null
+  },
+  {
+    "id": 2,
+    "slug": "cross-cradle-hold",
+    "title": "Cross-Cradle Hold",
+    "tagline": "More hand control — ideal for early latch problems",
+    "icon": "self_care",
+    "best_for": ["Latch difficulties", "Premature or small babies", "Early days of breastfeeding"],
+    "not_ideal_for": ["Long feeds (arm tires faster)", "Babies who resist head guidance"],
+    "difficulty": "beginner",
+    "steps": [
+      {
+        "order": 1,
+        "title": "Sit up with back fully supported",
+        "instruction": "Sit upright with a firm pillow behind your back. A nursing pillow on your lap helps hold the baby at the right height without straining your wrists.",
+        "tip": null
+      },
+      {
+        "order": 2,
+        "title": "Hold baby with the opposite arm",
+        "instruction": "If feeding from the right breast, hold baby with your LEFT hand. Cup the back of the baby's head — thumb behind one ear, fingers behind the other. Baby's body rests along your left forearm, facing you.",
+        "tip": "This is the key difference from the Cradle Hold: the opposite hand gives you precise control over head positioning."
+      },
+      {
+        "order": 3,
+        "title": "Support the breast with your same-side hand",
+        "instruction": "Use your right hand (same side as the breast) to support the breast in a C-shape — four fingers below, thumb above, well back from the areola.",
+        "tip": "Keep fingers away from the areola so they don't interfere with how much breast baby takes in."
+      },
+      {
+        "order": 4,
+        "title": "Align baby nose-to-nipple",
+        "instruction": "Position the baby so the nose is level with your nipple. This causes the head to tilt back slightly so the chin leads — which opens the jaw wider.",
+        "tip": null
+      },
+      {
+        "order": 5,
+        "title": "Trigger the latch reflex, then guide in",
+        "instruction": "Let the nipple brush baby's upper lip to trigger the root reflex. When the mouth opens wide, use your hand on the head to guide baby onto the breast — lead with the chin, not the nose.",
+        "tip": "Move your hand — don't push the head. Think of it as moving a cup to the baby's mouth."
+      }
+    ],
+    "latch_checklist": [
+      "Baby's chin is the first part touching the breast",
+      "Mouth covers more areola below the nipple than above",
+      "Lips are flanged out — not pursed or tucked",
+      "Baby's cheeks are full and rounded, not hollow",
+      "You hear swallowing — soft rhythmic gulp sounds",
+      "No clicking or smacking sounds during the feed"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Gripping the back of the skull and pushing baby onto the breast",
+        "fix": "Guide with gentle pressure behind the ears — pushing the skull causes the baby to pull back as a reflex."
+      },
+      {
+        "mistake": "Fingers too close to the areola on the C-hold",
+        "fix": "Move your hand further back on the breast so baby can take in enough tissue for a deep latch."
+      },
+      {
+        "mistake": "Rushing the latch before the mouth is fully open",
+        "fix": "Wait for the wide-open yawn moment — a shallow latch from a half-open mouth causes cracked nipples."
+      }
+    ],
+    "disclaimer": "This information is for general guidance only and is not a substitute for professional lactation support. If you experience persistent pain, poor weight gain in your baby, or any concerns, contact a certified lactation consultant (IBCLC) or your healthcare provider.",
+    "reviewed_by_id": null,
+    "last_reviewed_at": null
+  },
+  {
+    "id": 3,
+    "slug": "football-hold",
+    "title": "Football Hold",
+    "tagline": "Baby tucked under your arm like a football",
+    "icon": "sports",
+    "best_for": ["C-section recovery", "Large breasts", "Twins (feed both simultaneously)", "Babies who arch away from breast"],
+    "not_ideal_for": ["Small spaces (needs elbow room)", "Very active older babies"],
+    "difficulty": "intermediate",
+    "steps": [
+      {
+        "order": 1,
+        "title": "Sit upright with support on both sides",
+        "instruction": "Sit up in a chair or bed. Place a firm pillow on the side you're feeding from — this is where baby will rest. A nursing pillow works well here.",
+        "tip": "This position keeps the baby completely off your abdomen — ideal after a C-section."
+      },
+      {
+        "order": 2,
+        "title": "Tuck baby under your arm",
+        "instruction": "Hold baby along your forearm with the head in your hand. Baby's body is tucked under your arm — feet pointing toward your back, body alongside your ribcage. Baby faces up toward your breast.",
+        "tip": "Think of how you'd carry a football under one arm — baby's body is the ball."
+      },
+      {
+        "order": 3,
+        "title": "Support the head with a C or V grip",
+        "instruction": "Cup the back of baby's head with your hand — thumb behind one ear, index finger behind the other. The head should be able to tilt back slightly.",
+        "tip": null
+      },
+      {
+        "order": 4,
+        "title": "Support the breast with the other hand",
+        "instruction": "Use your free hand to support the breast in a C-shape if needed. Aim the nipple toward the baby's nose.",
+        "tip": null
+      },
+      {
+        "order": 5,
+        "title": "Bring baby to breast — nose leads",
+        "instruction": "Guide baby's nose toward the nipple. When the mouth opens wide, bring the chin to the breast first. The rest of the mouth follows over the nipple.",
+        "tip": "Because of the angle, you may have clearer visibility of the latch in this position — use it to check for deep attachment."
+      }
+    ],
+    "latch_checklist": [
+      "Baby's nose is clear — not pressed into the breast",
+      "Baby's body is alongside your ribcage, not angled outward",
+      "Chin is pressing into the breast",
+      "Mouth is wide, not pursed",
+      "You have a clear sightline to see the latch quality",
+      "No pain after the first 30 seconds of latching"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Baby's feet pressing against something behind you — causing baby to push away",
+        "fix": "Make sure there's nothing for the feet to push against. Keep baby's legs loose alongside your body."
+      },
+      {
+        "mistake": "Holding baby too low, pulling the nipple downward",
+        "fix": "Raise the pillow height so baby's mouth is level with the nipple without pulling."
+      },
+      {
+        "mistake": "Baby facing outward instead of up toward the breast",
+        "fix": "Baby should face directly toward your breast — the whole front of baby's body facing you."
+      }
+    ],
+    "disclaimer": "This information is for general guidance only and is not a substitute for professional lactation support. If you experience persistent pain, poor weight gain in your baby, or any concerns, contact a certified lactation consultant (IBCLC) or your healthcare provider.",
+    "reviewed_by_id": null,
+    "last_reviewed_at": null
+  },
+  {
+    "id": 4,
+    "slug": "side-lying",
+    "title": "Side-Lying",
+    "tagline": "Rest while you feed — perfect for night feeds",
+    "icon": "crib",
+    "best_for": ["Night feeds", "C-section recovery", "Perineal pain or stitches", "Tired or recovering mothers"],
+    "not_ideal_for": ["Very early newborns (until latch is established)", "Feeding in public"],
+    "difficulty": "intermediate",
+    "steps": [
+      {
+        "order": 1,
+        "title": "Lie on your side with hips stacked",
+        "instruction": "Lie on your side with knees slightly bent. Stack your hips directly on top of each other — don't twist. Place a pillow between your knees for comfort, especially after a C-section.",
+        "tip": "A pillow behind your back stops you rolling backward during long feeds."
+      },
+      {
+        "order": 2,
+        "title": "Position baby facing you at breast level",
+        "instruction": "Lay baby on their side facing you, tummy to tummy. Baby's mouth should be level with your nipple — not your collarbone. Adjust with a rolled blanket behind baby's back if needed.",
+        "tip": "Baby's spine should be straight — not curled or twisted."
+      },
+      {
+        "order": 3,
+        "title": "Support your breast if needed",
+        "instruction": "Use your lower hand to support your breast from underneath if it doesn't naturally meet the baby's mouth. Alternatively, roll slightly forward to bring your breast closer.",
+        "tip": null
+      },
+      {
+        "order": 4,
+        "title": "Guide baby's nose to the nipple",
+        "instruction": "Use your upper hand to guide baby's head gently — nose toward the nipple. Let baby tilt the head back and open wide before bringing the chin to the breast.",
+        "tip": null
+      },
+      {
+        "order": 5,
+        "title": "Stay awake during the feed",
+        "instruction": "Feed in this position only if you can stay awake. If you feel yourself drifting off, move baby to a safe sleep surface before you fall asleep. Safe sleep guidelines apply.",
+        "tip": "This position is for resting your body — not for sleeping while feeding."
+      }
+    ],
+    "latch_checklist": [
+      "Baby's body is fully facing yours — not angled away",
+      "Baby's ear, shoulder, and hip are aligned in a straight line",
+      "Baby's nose has a small air gap — not buried in the breast",
+      "Mouth covers a good portion of the areola",
+      "You are not straining your neck to watch — relax fully",
+      "Hear swallowing — not clicking or gulping air"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Baby's body angled away — only the head turned toward the breast",
+        "fix": "Rotate baby's whole body so the entire front faces you. Use a rolled muslin behind baby's back to hold the position."
+      },
+      {
+        "mistake": "Baby positioned too high or too low — pulling the nipple",
+        "fix": "Baby's mouth must be exactly at nipple level. Adjust with a folded towel under baby's head or behind their back."
+      },
+      {
+        "mistake": "Falling asleep with baby in bed on a soft surface",
+        "fix": "Side-lying can be done safely but requires a firm mattress, no gaps, and staying awake. Always follow your local safe sleep guidelines."
+      }
+    ],
+    "disclaimer": "This information is for general guidance only and is not a substitute for professional lactation support. Safe sleep guidelines should always be followed — never sleep in a bed with your newborn on a soft surface. If you experience persistent pain, poor weight gain in your baby, or any concerns, contact a certified lactation consultant (IBCLC) or your healthcare provider.",
+    "reviewed_by_id": null,
+    "last_reviewed_at": null
+  },
+  {
+    "id": 5,
+    "slug": "laid-back",
+    "title": "Laid-Back Hold",
+    "tagline": "Let gravity help — your body does the work",
+    "icon": "weekend",
+    "best_for": ["Overactive letdown (fast milk flow)", "Gassy babies", "Colicky babies", "Mothers with large breasts", "Any stage — highly versatile"],
+    "not_ideal_for": ["Mothers who need visual confirmation of the latch (harder to see from this angle)"],
+    "difficulty": "beginner",
+    "steps": [
+      {
+        "order": 1,
+        "title": "Recline comfortably — about 45 degrees",
+        "instruction": "Lean back against well-supported pillows — you're not lying flat, but not upright either. Think of how you'd sit back watching television. Your back, neck, and head should all be supported.",
+        "tip": "The more reclined you are, the more gravity helps hold baby against you — less arm work."
+      },
+      {
+        "order": 2,
+        "title": "Place baby tummy-down on your chest",
+        "instruction": "Lay baby face-down against your chest, between or to the side of your breasts. Baby's head should be near the breast you want to feed from. Let gravity hold the baby against you.",
+        "tip": "You don't need to position baby precisely — this position works with baby's instinct to find the breast."
+      },
+      {
+        "order": 3,
+        "title": "Let baby find the breast",
+        "instruction": "Newborns have strong feeding instincts. Give baby a moment to root around and move toward the nipple. You can guide gently with one hand, but many babies latch without help in this position.",
+        "tip": "This is why it's called 'biological nurturing' — it activates instinctive feeding reflexes."
+      },
+      {
+        "order": 4,
+        "title": "Support loosely — don't control",
+        "instruction": "Rest one hand loosely on baby's back for security. Avoid holding tightly or pushing toward the breast — let baby lead. Your body is the feeding surface; baby does the rest.",
+        "tip": null
+      },
+      {
+        "order": 5,
+        "title": "Adjust your recline angle if milk flows too fast",
+        "instruction": "The more upright you are, the faster milk flows. The more reclined, the slower. If baby is spluttering or gulping, lean back further to slow the flow.",
+        "tip": "This is the best position for overactive letdown — gravity becomes a flow regulator."
+      }
+    ],
+    "latch_checklist": [
+      "Baby's full body weight rests against your chest",
+      "Baby's airway is clear — head not pushed into breast",
+      "Chin is pressing into the breast",
+      "You can breathe normally and are fully relaxed",
+      "Baby is swallowing steadily, not gulping air",
+      "No discomfort in your neck or shoulders"
+    ],
+    "common_mistakes": [
+      {
+        "mistake": "Sitting too upright — not actually laid back",
+        "fix": "You need to be genuinely reclined, not just leaning slightly. The more reclined, the more the position works. Try further back than feels instinctive."
+      },
+      {
+        "mistake": "Trying to hold and position baby the same way as an upright position",
+        "fix": "Let go of control. Baby's weight and gravity do the positioning. A light hand on the back is all that's needed."
+      },
+      {
+        "mistake": "Using this position while sitting upright",
+        "fix": "Without the recline, baby's weight doesn't help hold them in place. The recline is what makes this position work."
+      }
+    ],
+    "disclaimer": "This information is for general guidance only and is not a substitute for professional lactation support. If you experience persistent pain, poor weight gain in your baby, or any concerns, contact a certified lactation consultant (IBCLC) or your healthcare provider.",
+    "reviewed_by_id": null,
+    "last_reviewed_at": null
+  }
+]

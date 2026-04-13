@@ -1,0 +1,42 @@
+{
+  "phase1": {
+    "paths": [
+      "tests/bdd/phase1a-fixes.feature",
+      "tests/bdd/phase1-symptoms.feature",
+      "tests/bdd/phase1-positions.feature"
+    ],
+    "require": ["tests/steps/phase1.steps.ts"],
+    "requireModule": ["tsx/cjs"],
+    "format": ["progress-bar", "summary"],
+    "forceExit": true
+  },
+  "phase2": {
+    "paths": [
+      "tests/bdd/phase2-triage.feature",
+      "tests/bdd/phase2-triage-edge-cases.feature"
+    ],
+    "require": ["tests/steps/phase2.steps.ts"],
+    "requireModule": ["tsx/cjs"],
+    "format": ["progress-bar", "summary"],
+    "forceExit": true
+  },
+  "phase3-safety": {
+    "paths": [
+      "tests/bdd/phase3-safety-gate.feature",
+      "tests/bdd/phase3-safety-gate-edge-cases.feature"
+    ],
+    "require": ["tests/steps/safety.steps.ts"],
+    "requireModule": ["tsx/cjs"],
+    "format": ["progress-bar", "summary"],
+    "forceExit": true
+  },
+  "phase3-provider": {
+    "paths": [
+      "tests/bdd/phase3-provider-fallback.feature"
+    ],
+    "require": ["tests/steps/phase3-provider.steps.ts"],
+    "requireModule": ["tsx/cjs"],
+    "format": ["progress-bar", "summary"],
+    "forceExit": true
+  }
+}

@@ -1,0 +1,2681 @@
+/* ============================================================
+   POSTPARTUM GUIDE – styles.css
+   "Digital Sanctuary" design system
+   Mobile-first. All colours from DESIGN.md token set.
+   Tailwind handles utility classes; this file owns:
+     • CSS custom properties (design tokens)
+     • Typography baseline
+     • Glassmorphism surfaces
+     • Card & list components
+     • Severity pills
+     • Symptom detail sections
+     • Loading skeleton
+     • Error state
+     • Animations
+     • Scrollbar suppression
+   ============================================================ */
+
+
+/* ──────────────────────────────────────────────────────────────
+   1. DESIGN TOKENS (CSS custom properties)
+   Mirror of the Tailwind config so non-Tailwind rules can use them.
+   ──────────────────────────────────────────────────────────────*/
+:root {
+  /* Surfaces */
+  --surface:                   #faf9f5;
+  --surface-dim:               #d9dbd5;
+  --surface-container-lowest:  #ffffff;
+  --surface-container-low:     #f4f4ef;
+  --surface-container:         #eeeee9;
+  --surface-container-high:    #e8e9e3;
+  --surface-container-highest: #e1e3dd;
+
+  /* Primary – Sage Green */
+  --primary:            #466743;
+  --primary-container:  #c6edbf;
+  --primary-fixed:      #c6edbf;
+  --primary-dim:        #3a5b38;
+  --on-primary:         #eaffe3;
+  --on-primary-container: #395937;
+
+  /* Secondary – Dusty Rose */
+  --secondary:           #7d554f;
+  --secondary-container: #ffdad4;
+  --secondary-dim:       #704943;
+  --on-secondary:        #fff7f6;
+  --on-secondary-container: #6e4842;
+
+  /* Neutrals */
+  --background:          #faf9f5;
+  --on-background:       #30332f;
+  --on-surface:          #30332f;
+  --on-surface-variant:  #5d605b;
+  --outline:             #797c76;
+  --outline-variant:     #b0b3ad;
+
+  /* Error / Red flags */
+  --error:               #a73b21;
+  --error-container:     #fd795a;
+  --on-error:            #fff7f6;
+  --on-error-container:  #6e1400;
+
+  /* Severity – semantic colour aliases */
+  --severity-red-bg:     #fde8e3;
+  --severity-red-text:   #7a1e0a;
+  --severity-yellow-bg:  #fef3c7;
+  --severity-yellow-text:#78450a;
+  --severity-green-bg:   #c6edbf;
+  --severity-green-text: #274626;
+
+  /* Spacing */
+  --nav-height-bottom:   88px;   /* pb-32 equivalent so content clears nav */
+  --nav-height-top:      80px;   /* pt-24 equivalent */
+
+  /* Radius */
+  --radius-card:  0.75rem;   /* xl */
+  --radius-pill:  9999px;    /* full */
+  --radius-large: 1.5rem;    /* 3xl */
+
+  /* Typography */
+  --font-headline: 'Noto Serif', serif;
+  --font-body:     'Plus Jakarta Sans', sans-serif;
+
+  /* Shadows – diffuse, tinted per DESIGN.md "Ambient Shadows" rule */
+  --shadow-card:   0 4px 16px rgba(48, 51, 47, 0.06);
+  --shadow-nav:    0 -4px 24px rgba(48, 51, 47, 0.06);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   2. GLOBAL RESET & BASE
+   ──────────────────────────────────────────────────────────────*/
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;              /* DESIGN.md: 1.6x line-height for tired eyes */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: max(884px, 100dvh);
+}
+
+/* Headings use Noto Serif for editorial warmth */
+h1, h2, h3, h4,
+.font-headline {
+  font-family: var(--font-headline);
+  line-height: 1.25;
+  color: var(--on-background);
+}
+
+/* Body copy */
+p, li, span {
+  font-family: var(--font-body);
+}
+
+/* DESIGN.md: never pure black – use on-surface (#30332f) */
+* {
+  color: inherit;
+}
+
+/* Remove tap highlight on mobile */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Focus ring – accessible but gentle */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-card);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   3. SCROLLBAR SUPPRESSION
+   ──────────────────────────────────────────────────────────────*/
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   4. TOP APP BAR
+   Glassmorphism: surface at 80% opacity + 20px blur (DESIGN.md)
+   ──────────────────────────────────────────────────────────────*/
+#top-bar {
+  background: rgba(250, 249, 245, 0.82);    /* --surface at 82% */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  /* DESIGN.md "No-Line Rule" – boundary via tonal shift, no border */
+  border-bottom: none;
+  box-shadow: 0 1px 0 rgba(176, 179, 173, 0.25); /* ghost border fallback */
+}
+
+/* Dark mode override */
+.dark #top-bar {
+  background: rgba(13, 15, 13, 0.82);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   5. MAIN CONTENT CANVAS
+   ──────────────────────────────────────────────────────────────*/
+#main-canvas {
+  padding-top: var(--nav-height-top);
+  padding-bottom: var(--nav-height-bottom);
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  #main-canvas {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   6. BOTTOM NAVIGATION BAR
+   ──────────────────────────────────────────────────────────────*/
+#bottom-nav {
+  background: rgba(250, 249, 245, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-nav);
+  /* DESIGN.md "No-Line Rule" */
+  border-top: none;
+}
+
+.dark #bottom-nav {
+  background: rgba(13, 15, 13, 0.92);
+}
+
+/* All nav buttons */
+#bottom-nav button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  min-width: 64px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#bottom-nav button:active:not([disabled]) {
+  transform: scale(0.94);
+}
+
+/* Active pill – Symptoms */
+#nav-symptoms {
+  background-color: rgba(198, 237, 191, 0.6);  /* primary-container/60 */
+  color: var(--primary);
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.5rem;
+}
+
+#nav-symptoms .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Inactive / disabled tabs */
+#nav-positions,
+#nav-more {
+  color: var(--on-surface-variant);
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-radius: var(--radius-pill);
+  padding: 0.5rem 1.5rem;
+}
+
+/* Nav labels */
+#bottom-nav span.text-label {
+  font-size: 0.6875rem;    /* 11px */
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  display: block;
+  margin-top: 2px;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   7. SYMPTOMS LIST SCREEN
+   ──────────────────────────────────────────────────────────────*/
+
+/* Page header */
+.symptoms-header {
+  padding: 1.5rem 0.5rem 0.5rem;
+}
+
+.symptoms-header h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-family: var(--font-headline);
+  color: var(--on-background);
+  margin-bottom: 0.5rem;
+}
+
+.symptoms-header p {
+  font-size: 1.0625rem;
+  color: var(--on-surface-variant);
+  max-width: 36ch;
+  line-height: 1.6;
+}
+
+/* Card list – DESIGN.md "No-Divider Rule": whitespace separates, not lines */
+.symptom-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;         /* 20px – generous breathing room between cards */
+  padding: 0.5rem 0;
+}
+
+/* Individual symptom card */
+.symptom-card {
+  width: 100%;
+  text-align: left;
+  background-color: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  padding: 1.25rem 1.25rem 1rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  /* DESIGN.md "No-Line Rule" – no border */
+}
+
+.symptom-card:hover {
+  background-color: var(--surface-container-low);
+  box-shadow: 0 6px 20px rgba(48, 51, 47, 0.09);
+}
+
+.symptom-card:active {
+  transform: scale(0.985);
+  background-color: var(--surface-container);
+}
+
+/* Card top row: text block + severity pill */
+.symptom-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+/* Category label above title */
+.symptom-card__category {
+  font-size: 0.6875rem;     /* 11px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(70, 103, 67, 0.65);  /* primary at 65% */
+  font-family: var(--font-body);
+  margin-bottom: 0.2rem;
+}
+
+/* Main title – what the user feels */
+.symptom-card__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  line-height: 1.35;
+  margin-bottom: 0.25rem;
+  font-family: var(--font-body);
+  overflow-wrap: break-word;
+}
+
+/* Clinical sub-label */
+.symptom-card__clinical {
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+}
+
+/* Card bottom row: "View guide →" link */
+.symptom-card__action {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-body);
+  margin-top: 0.5rem;
+}
+
+.symptom-card__action .material-symbols-outlined {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.symptom-card:hover .symptom-card__action .material-symbols-outlined {
+  transform: translateX(3px);
+}
+
+/* Encouragement banner at bottom of list */
+.encouragement-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-large);
+  background-color: rgba(255, 218, 212, 0.25);  /* secondary-container/25 */
+  padding: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.encouragement-banner h4 {
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  color: var(--secondary);
+  margin-bottom: 0.4rem;
+}
+
+.encouragement-banner p {
+  font-size: 0.875rem;
+  color: var(--on-secondary-container);
+  line-height: 1.6;
+  max-width: 28ch;
+}
+
+.encouragement-banner .deco-icon {
+  position: absolute;
+  right: -1rem;
+  bottom: -1rem;
+  font-size: 7rem;
+  color: rgba(255, 218, 212, 0.45);
+  transform: rotate(12deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   8. SEVERITY PILLS
+   green  → "All good"
+   yellow → "Attention needed"
+   red    → "Urgent care"
+   DESIGN.md: never use Error Red for non-critical warnings
+   ──────────────────────────────────────────────────────────────*/
+.severity-pill {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;    /* 11px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.severity-pill--green {
+  background-color: var(--severity-green-bg);
+  color: var(--severity-green-text);
+}
+
+.severity-pill--yellow {
+  background-color: var(--severity-yellow-bg);
+  color: var(--severity-yellow-text);
+}
+
+.severity-pill--red {
+  background-color: var(--severity-red-bg);
+  color: var(--severity-red-text);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   9. SYMPTOM DETAIL SCREEN
+   ──────────────────────────────────────────────────────────────*/
+
+/* Back button row */
+.detail-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-body);
+  transition: opacity 0.2s ease;
+}
+
+.detail-back-btn:hover { opacity: 0.72; }
+.detail-back-btn:active { opacity: 0.55; }
+
+.detail-back-btn .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+/* Detail header badges row */
+.detail-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+/* Category badge (grey tone) */
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+}
+
+/* Main symptom title */
+.detail-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  color: var(--on-background);
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  overflow-wrap: break-word;
+}
+
+/* Clinical label under title */
+.detail-clinical {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  font-family: var(--font-body);
+  margin-bottom: 1.5rem;
+}
+
+.detail-clinical .material-symbols-outlined {
+  font-size: 1rem;
+}
+
+/* "What this is" intro card */
+.detail-intro-card {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--surface-container-low);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Decorative glow inside the intro card */
+.detail-intro-card::after {
+  content: '';
+  position: absolute;
+  top: -1.5rem;
+  right: -1.5rem;
+  width: 6rem;
+  height: 6rem;
+  background: rgba(198, 237, 191, 0.35);
+  border-radius: 50%;
+  filter: blur(24px);
+  pointer-events: none;
+}
+
+.detail-intro-card h3 {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--primary-dim);
+  margin-bottom: 0.75rem;
+}
+
+.detail-intro-card p {
+  font-size: 0.9375rem;
+  color: var(--on-surface-variant);
+  line-height: 1.65;
+  margin-bottom: 0.6rem;
+}
+
+.detail-intro-card p:last-child { margin-bottom: 0; }
+
+/* Section divider header (e.g. "Immediate relief steps") */
+.detail-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.detail-section-header h3 {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  white-space: nowrap;
+}
+
+.detail-section-divider {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(176, 179, 173, 0.2);
+}
+
+/* Numbered step cards */
+.step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 1.75rem;
+}
+
+.step-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.125rem;
+  background-color: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-container);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+}
+
+.step-body p.step-title {
+  font-weight: 700;
+  color: var(--on-background);
+  font-size: 0.9375rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+.step-body p.step-desc {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+}
+
+/* Dos & Don'ts bento grid */
+.dos-donts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  margin-bottom: 1.75rem;
+}
+
+.dos-box {
+  background-color: rgba(198, 237, 191, 0.22);
+  border-radius: var(--radius-card);
+  padding: 1.125rem;
+}
+
+.donts-box {
+  background-color: rgba(255, 218, 212, 0.28);
+  border-radius: var(--radius-card);
+  padding: 1.125rem;
+}
+
+.dos-box__header,
+.donts-box__header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  font-family: var(--font-body);
+}
+
+.dos-box__header {
+  color: var(--primary);
+}
+
+.donts-box__header {
+  color: var(--secondary);
+}
+
+.dos-box__header .material-symbols-outlined,
+.donts-box__header .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+.dos-box ul,
+.donts-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dos-box li,
+.donts-box li {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  line-height: 1.45;
+  font-family: var(--font-body);
+}
+
+.dos-box li::before { content: "• "; color: var(--primary); }
+.donts-box li::before { content: "• "; color: var(--secondary); }
+
+/* Red flags callout */
+.red-flags-box {
+  background-color: rgba(253, 121, 90, 0.08);
+  border-left: 4px solid var(--error);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.red-flags-box__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--error);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  font-family: var(--font-body);
+  margin-bottom: 0.875rem;
+}
+
+.red-flags-box__header .material-symbols-outlined {
+  font-size: 1.2rem;
+  font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+}
+
+.red-flags-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.red-flags-box li {
+  display: flex;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: var(--on-surface);
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+
+.red-flags-box li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background-color: var(--error);
+  margin-top: 0.45rem;
+}
+
+/* Recommended action text below red flags */
+.red-flags-action {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--error);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* When to expect improvement block */
+.improvement-block {
+  text-align: center;
+  padding: 1.25rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.improvement-block .material-symbols-outlined {
+  font-size: 2.25rem;
+  color: var(--secondary-dim);
+  opacity: 0.4;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.improvement-block h4 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-background);
+  margin-bottom: 0.5rem;
+}
+
+.improvement-block p {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  line-height: 1.65;
+  max-width: 36ch;
+  margin: 0 auto;
+}
+
+.improvement-block strong {
+  color: var(--primary-dim);
+  font-weight: 700;
+}
+
+/* Medical disclaimer footer */
+.disclaimer-footer {
+  text-align: center;
+  padding: 1rem 2rem 2rem;
+}
+
+.disclaimer-footer .disclaimer-label {
+  font-size: 0.625rem;   /* 10px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--outline);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.disclaimer-footer p {
+  font-size: 0.625rem;
+  color: rgba(121, 124, 118, 0.7);
+  line-height: 1.7;
+  font-style: italic;
+  font-family: var(--font-body);
+}
+
+/* ── Reviewer attribution ────────────────────────────────── */
+
+/* Shown when a real reviewer is assigned */
+.reviewer-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--primary-container);
+  border-radius: 0.75rem;
+  text-align: left;
+}
+
+.reviewer-badge .material-symbols-outlined {
+  font-size: 1rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+.reviewer-badge__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.reviewer-badge__name {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  font-style: normal;
+  line-height: 1.4;
+}
+
+.reviewer-badge__meta {
+  font-size: 0.625rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  font-style: normal;
+  line-height: 1.4;
+}
+
+/* Shown when reviewed_by_id is null — review not yet assigned */
+.reviewer-pending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.625rem;
+  color: var(--outline);
+  font-family: var(--font-body);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.reviewer-pending .material-symbols-outlined {
+  font-size: 0.875rem;
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   10. LOADING SKELETON SCREEN
+   "Breathing" fade – slow, calm. No rapid-fire animations.
+   (DESIGN.md: "use slow, breathing fades")
+   ──────────────────────────────────────────────────────────────*/
+@keyframes skeleton-breathe {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+.skeleton-pulse {
+  animation: skeleton-breathe 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Skeleton card shell */
+.skeleton-card {
+  background-color: var(--surface-container-low);
+  border-radius: var(--radius-large);
+  padding: 1.375rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Individual skeleton bars */
+.skeleton-bar {
+  background-color: var(--surface-container-highest);
+  border-radius: var(--radius-pill);
+}
+
+/* Skeleton pill (severity badge placeholder) */
+.skeleton-pill {
+  border-radius: var(--radius-pill);
+  height: 1.75rem;
+}
+
+/* Loading header text */
+.loading-header h1 {
+  font-family: var(--font-headline);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  color: var(--on-surface);
+  margin-bottom: 0.5rem;
+}
+
+.loading-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--on-surface-variant);
+  font-size: 0.9375rem;
+}
+
+.loading-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--primary);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   11. ERROR STATE SCREEN
+   ──────────────────────────────────────────────────────────────*/
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  min-height: 55vh;
+}
+
+/* Decorative blob behind the icon */
+.error-icon-wrap {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.error-glow {
+  position: absolute;
+  inset: -2.5rem;
+  background: rgba(255, 218, 212, 0.25);
+  border-radius: 50%;
+  filter: blur(2rem);
+  pointer-events: none;
+}
+
+.error-icon-circle {
+  position: relative;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  background-color: var(--surface-container-low);
+  /* DESIGN.md "Ghost Border Fallback": outline-variant at 20% opacity */
+  box-shadow: 0 0 0 1px rgba(176, 179, 173, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.error-icon-circle .material-symbols-outlined {
+  font-size: 2.75rem;
+  color: var(--secondary);
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
+
+.error-title {
+  font-family: var(--font-headline);
+  font-size: clamp(1.375rem, 5vw, 1.75rem);
+  color: var(--on-surface);
+  line-height: 1.25;
+  max-width: 22ch;
+  margin: 0 auto 0.875rem;
+}
+
+.error-body {
+  font-size: 1rem;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  max-width: 30ch;
+  margin: 0 auto 2.5rem;
+}
+
+/* Primary CTA button – glow gradient per DESIGN.md */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3.5rem;                /* min 56px – DESIGN.md touch target rule */
+  min-width: 14rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--on-primary);
+  /* "Glow Gradient" signature from DESIGN.md */
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
+  box-shadow: 0 12px 24px rgba(70, 103, 67, 0.18);
+  transition: box-shadow 0.25s ease, transform 0.15s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 16px 32px rgba(70, 103, 67, 0.24);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-primary .material-symbols-outlined {
+  font-size: 1.2rem;
+  transition: transform 0.25s ease;
+}
+
+.btn-primary:hover .material-symbols-outlined {
+  transform: rotate(45deg);
+}
+
+/* Secondary / text link button */
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--primary);
+  transition: background-color 0.2s ease;
+  min-height: 2.75rem;           /* 44px tap target */
+}
+
+.btn-text:hover {
+  background-color: rgba(198, 237, 191, 0.3);
+}
+
+.btn-text .material-symbols-outlined {
+  font-size: 1.1rem;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   12. SMOOTH SCREEN TRANSITIONS
+   Fade-in when app.js swaps content into #app-root
+   ──────────────────────────────────────────────────────────────*/
+@keyframes screen-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.screen-enter {
+  animation: screen-fade-in 0.28s ease forwards;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   13. RESPONSIVE SCALE-UPS
+   Mobile-first → tablet/desktop adjustments
+   ──────────────────────────────────────────────────────────────*/
+
+/* Very small phones (320–400 px): stack Do's / Don'ts vertically
+   so text items aren't crushed into ~85 px columns */
+@media (max-width: 400px) {
+  .dos-donts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 480px) {
+  .symptom-card {
+    padding: 1.5rem;
+  }
+
+  .dos-donts-grid {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .symptom-card-list {
+    gap: 1.5rem;
+  }
+
+  .step-card {
+    padding: 1.375rem;
+  }
+
+  .detail-title {
+    font-size: 2rem;
+  }
+
+  .symptoms-header h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  /* On wider screens the bottom nav is still visible (useful on small tablets).
+     Adjust the selector below to md:hidden if you want desktop-only top nav. */
+  .symptom-card-list {
+    gap: 1.75rem;
+  }
+
+  .position-card-list {
+    gap: 1.75rem;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   14. POSITIONS LIST SCREEN
+   ──────────────────────────────────────────────────────────── */
+
+.positions-header {
+  padding: 1.5rem 0.5rem 0.5rem;
+}
+
+.positions-header h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-family: var(--font-headline);
+  color: var(--on-background);
+  margin-bottom: 0.5rem;
+}
+
+.positions-header p {
+  font-size: 1.0625rem;
+  color: var(--on-surface-variant);
+  max-width: 36ch;
+  line-height: 1.6;
+}
+
+/* Card list — same rhythm as symptom list */
+.position-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+/* Individual position card */
+.position-card {
+  width: 100%;
+  text-align: left;
+  background-color: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+}
+
+.position-card:hover {
+  background-color: var(--surface-container-low);
+  box-shadow: 0 6px 20px rgba(48, 51, 47, 0.09);
+}
+
+.position-card:active {
+  transform: scale(0.985);
+  background-color: var(--surface-container);
+}
+
+/* Card top row */
+.position-card__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
+}
+
+/* Icon circle */
+.position-card__icon {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-container);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-card__icon .material-symbols-outlined {
+  font-size: 1.3rem;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.position-card__text {
+  flex: 1;
+}
+
+/* Difficulty badge */
+.position-card__difficulty {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(70, 103, 67, 0.65);
+  font-family: var(--font-body);
+  margin-bottom: 0.2rem;
+}
+
+.position-card__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  line-height: 1.35;
+  margin-bottom: 0.2rem;
+  font-family: var(--font-body);
+}
+
+.position-card__tagline {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.4;
+}
+
+/* "Best for" tag strip */
+.position-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.best-for-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+}
+
+/* "View steps →" action row */
+.position-card__action {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-body);
+}
+
+.position-card__action .material-symbols-outlined {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.position-card:hover .position-card__action .material-symbols-outlined {
+  transform: translateX(3px);
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   15. POSITION DETAIL SCREEN
+   ──────────────────────────────────────────────────────────── */
+
+/* Hero header block */
+.position-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--surface-container-low);
+  border-radius: var(--radius-large);
+}
+
+.position-detail-hero__icon {
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-container);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.position-detail-hero__icon .material-symbols-outlined {
+  font-size: 1.75rem;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.position-detail-hero__text h1 {
+  font-family: var(--font-headline);
+  font-size: clamp(1.375rem, 4vw, 1.75rem);
+  color: var(--on-background);
+  line-height: 1.2;
+  margin-bottom: 0.2rem;
+}
+
+.position-detail-hero__text p {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  line-height: 1.5;
+}
+
+/* Step counter header */
+.step-counter {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  font-family: var(--font-body);
+  margin-bottom: 0.25rem;
+}
+
+/* Step card — reuses .step-card, .step-number, .step-body from symptom detail */
+/* Tip callout inside a step */
+.step-tip {
+  margin-top: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  background-color: rgba(198, 237, 191, 0.22);
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--on-primary-container);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+}
+
+.step-tip .material-symbols-outlined {
+  font-size: 0.9rem;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* Latch checklist */
+.latch-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.latch-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--on-surface);
+  line-height: 1.5;
+  font-family: var(--font-body);
+}
+
+.latch-checklist li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--primary-container);
+  background-color: var(--surface-container-lowest);
+  margin-top: 0.1rem;
+}
+
+/* Interactive checked state (JS toggles .is-checked) */
+.latch-checklist li.is-checked::before {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eaffe3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-size: 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.latch-checklist li {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.375rem;
+  transition: background-color 0.15s ease;
+}
+
+.latch-checklist li:hover {
+  background-color: var(--surface-container-low);
+}
+
+.latch-checklist li.is-checked {
+  color: var(--on-surface-variant);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* Common mistakes block */
+.mistakes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  margin-bottom: 1.75rem;
+}
+
+.mistake-card {
+  background-color: rgba(255, 218, 212, 0.18);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.125rem;
+}
+
+.mistake-card__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+  font-family: var(--font-body);
+  margin-bottom: 0.25rem;
+}
+
+.mistake-card__mistake {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.mistake-card__fix-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  font-family: var(--font-body);
+  margin-bottom: 0.25rem;
+}
+
+.mistake-card__fix {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+/* Not ideal for block */
+.not-ideal-box {
+  background-color: var(--surface-container-low);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.125rem;
+  margin-bottom: 1.75rem;
+}
+
+.not-ideal-box__header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  margin-bottom: 0.625rem;
+}
+
+.not-ideal-box__header .material-symbols-outlined {
+  font-size: 1rem;
+}
+
+.not-ideal-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.not-ideal-box li {
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.45;
+}
+
+.not-ideal-box li::before {
+  content: "— ";
+  color: var(--outline);
+}
+
+/* Active nav state for Positions tab */
+#nav-positions.is-active {
+  background-color: rgba(198, 237, 191, 0.6);
+  color: var(--primary);
+  border-radius: var(--radius-pill);
+  opacity: 1;
+  cursor: pointer;
+}
+
+#nav-positions.is-active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Active nav state for More/Chat tab */
+#nav-more.is-active {
+  background-color: rgba(198, 237, 191, 0.6);
+  color: var(--primary);
+  border-radius: var(--radius-pill);
+  opacity: 1;
+  cursor: pointer;
+}
+
+#nav-more.is-active .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+
+/* ──────────────────────────────────────────────────────────────
+   16. CHAT SCREEN
+   ──────────────────────────────────────────────────────────── */
+
+.chat-screen {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--nav-height-top) - var(--nav-height-bottom));
+}
+
+/* Message list — scrollable area */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chat-messages::-webkit-scrollbar { display: none; }
+.chat-messages { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Empty state */
+.chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  gap: 0.75rem;
+}
+
+.chat-empty__icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-container);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+}
+
+.chat-empty__icon .material-symbols-outlined {
+  font-size: 1.5rem;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.chat-empty h2 {
+  font-family: var(--font-headline);
+  font-size: 1.25rem;
+  color: var(--on-background);
+  margin-bottom: 0.25rem;
+}
+
+.chat-empty p {
+  font-size: 0.9375rem;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+  max-width: 30ch;
+  margin: 0 auto;
+}
+
+/* Prompt chip suggestions */
+.chat-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 360px;
+  margin: 1rem auto 0;
+}
+
+.chat-prompt-chip {
+  background-color: var(--surface-container-low);
+  border: none;
+  border-radius: var(--radius-card);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  cursor: pointer;
+  line-height: 1.45;
+  transition: background-color 0.2s ease;
+}
+
+.chat-prompt-chip:hover {
+  background-color: var(--surface-container);
+}
+
+/* Message bubbles */
+.chat-bubble {
+  max-width: 85%;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-large);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  font-family: var(--font-body);
+}
+
+.chat-bubble--user {
+  align-self: flex-end;
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-bottom-right-radius: 0.375rem;
+}
+
+.chat-bubble--coach {
+  align-self: flex-start;
+  background-color: var(--surface-container-lowest);
+  color: var(--on-surface);
+  box-shadow: var(--shadow-card);
+  border-bottom-left-radius: 0.375rem;
+}
+
+/* Escalation card inside chat */
+.chat-escalation {
+  align-self: stretch;
+  background-color: rgba(253, 121, 90, 0.08);
+  border-left: 4px solid var(--error);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+}
+
+.chat-escalation__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--error);
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  margin-bottom: 0.625rem;
+}
+
+.chat-escalation__header .material-symbols-outlined {
+  font-size: 1.25rem;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.chat-escalation__body {
+  font-size: 0.9375rem;
+  color: var(--on-surface);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.chat-escalation__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.chat-escalation__action {
+  background-color: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  padding: 0.75rem 0.875rem;
+  box-shadow: var(--shadow-card);
+}
+
+.chat-escalation__action-label {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  margin-bottom: 0.25rem;
+}
+
+.chat-escalation__action-detail {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+.chat-escalation__reassurance {
+  margin-top: 0.875rem;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+.chat-escalation__disclaimer {
+  margin-top: 0.75rem;
+  font-size: 0.625rem;
+  color: var(--outline);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+/* Input bar — fixed to bottom of chat area */
+.chat-input-bar {
+  padding: 0.75rem 0.5rem 0.5rem;
+  border-top: 1px solid rgba(176, 179, 173, 0.15);
+  background-color: var(--background);
+}
+
+.chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.625rem;
+  background-color: var(--surface-container-low);
+  border-radius: 1.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+}
+
+.chat-input-row textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--on-surface);
+  resize: none;
+  line-height: 1.5;
+  max-height: 6rem;
+  overflow-y: auto;
+  outline: none;
+}
+
+.chat-input-row textarea::placeholder {
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+}
+
+.chat-send-btn {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.chat-send-btn:not(:disabled):active {
+  transform: scale(0.93);
+}
+
+.chat-send-btn .material-symbols-outlined {
+  font-size: 1.2rem;
+}
+
+/* Coming-soon coach badge */
+.coach-coming-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  background-color: var(--surface-container-high);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.625rem;
+  margin-bottom: 0.75rem;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 1A — ONBOARDING SCREEN
+   ══════════════════════════════════════════════════════════ */
+
+.onboarding-screen {
+  padding: 2rem 1.25rem 3rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.onboarding-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.onboarding-hero__icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--secondary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.onboarding-hero__icon .material-symbols-outlined {
+  font-size: 2rem;
+  color: var(--secondary);
+}
+
+.onboarding-hero h1 {
+  font-size: 1.875rem;
+  font-family: var(--font-headline);
+  color: var(--on-background);
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-hero p {
+  font-size: 1rem;
+  color: var(--on-surface-variant);
+  line-height: 1.6;
+}
+
+/* Form */
+.onboarding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.onboarding-field label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+}
+
+.onboarding-field input[type="text"],
+.onboarding-field input[type="date"] {
+  background: var(--surface-container-low);
+  border: none;
+  border-radius: var(--radius-card);
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--on-surface);
+  width: 100%;
+  transition: background 0.2s ease;
+}
+
+.onboarding-field input:focus {
+  background: var(--surface-container-lowest);
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+}
+
+.onboarding-field__hint {
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* Delivery type toggle */
+.delivery-type-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.delivery-type-option {
+  cursor: pointer;
+}
+
+.delivery-type-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.delivery-type-option__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 1rem;
+  border-radius: var(--radius-card);
+  background: var(--surface-container-low);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  transition: background 0.2s ease, color 0.2s ease;
+  text-align: center;
+}
+
+.delivery-type-option__label .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+.delivery-type-option input:checked + .delivery-type-option__label {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.delivery-type-option input:focus-visible + .delivery-type-option__label {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Error */
+.onboarding-error {
+  font-size: 0.875rem;
+  color: var(--error);
+  font-family: var(--font-body);
+  padding: 0.5rem 0;
+}
+
+/* Submit button */
+.onboarding-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 3.5rem;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
+  color: var(--on-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 8px 20px rgba(70, 103, 67, 0.20);
+}
+
+.onboarding-submit:hover  { opacity: 0.92; }
+.onboarding-submit:active { transform: scale(0.98); }
+
+/* Privacy note */
+.onboarding-privacy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.onboarding-privacy .material-symbols-outlined {
+  font-size: 0.875rem;
+}
+
+/* Dark mode overrides */
+.dark .onboarding-hero__icon   { background: var(--secondary-container); }
+.dark .onboarding-field input  { background: var(--surface-container-low); color: var(--on-surface); }
+.dark .delivery-type-option__label { background: var(--surface-container-low); }
+.dark .delivery-type-option input:checked + .delivery-type-option__label {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 1A — HOME SCREEN
+   ══════════════════════════════════════════════════════════ */
+
+.home-screen {
+  padding: 1.5rem 0.25rem 1rem;
+}
+
+/* Greeting header */
+.home-greeting {
+  padding: 0.5rem 0.75rem 1.5rem;
+  text-align: left;
+}
+
+.home-greeting__day {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--primary);
+  background: var(--primary-container);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.75rem;
+  margin-bottom: 0.875rem;
+  font-family: var(--font-body);
+}
+
+.home-greeting__title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-family: var(--font-headline);
+  color: var(--on-background);
+  line-height: 1.2;
+  margin-bottom: 0.375rem;
+}
+
+.home-greeting__sub {
+  font-size: 1rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+/* Quick-access 3-button row */
+.home-nav-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+  margin-bottom: 1.75rem;
+  padding: 0 0.25rem;
+}
+
+.home-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.875rem 0.5rem;
+  border-radius: var(--radius-card);
+  border: none;
+  background: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.home-nav-btn .material-symbols-outlined {
+  font-size: 1.375rem;
+  margin-bottom: 0.1rem;
+}
+
+.home-nav-btn:hover  { background: var(--surface-container); color: var(--on-surface); }
+.home-nav-btn:active { transform: scale(0.96); }
+
+/* Sections */
+.home-section {
+  margin-bottom: 1.5rem;
+  padding: 0 0.25rem;
+}
+
+.home-section__title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  margin-bottom: 0.75rem;
+}
+
+/* Quick symptom cards */
+.home-quick-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home-quick-card {
+  width: 100%;
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.125rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.home-quick-card:hover  { background: var(--surface-container-low); }
+.home-quick-card:active { transform: scale(0.985); }
+
+.home-quick-card .severity-pill { margin-bottom: 0.5rem; }
+
+.home-quick-card__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  line-height: 1.35;
+  margin-bottom: 0.375rem;
+}
+
+.home-quick-card__cta {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-body);
+}
+
+.home-quick-card__cta .material-symbols-outlined { font-size: 1rem; }
+
+/* Featured position card */
+.home-featured-position {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  background: var(--surface-container-lowest);
+  border-radius: var(--radius-card);
+  padding: 1rem 1.125rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.home-featured-position:hover  { background: var(--surface-container-low); }
+.home-featured-position:active { transform: scale(0.985); }
+
+.home-featured-position__icon {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-card);
+  background: var(--primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-primary-container);
+}
+
+.home-featured-position__icon .material-symbols-outlined { font-size: 1.375rem; }
+
+.home-featured-position__text { flex: 1; min-width: 0; }
+
+.home-featured-position__title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  font-family: var(--font-body);
+  margin-bottom: 0.2rem;
+}
+
+.home-featured-position__tagline {
+  font-size: 0.8125rem;
+  color: var(--on-surface-variant);
+  font-family: var(--font-body);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-featured-position__arrow {
+  flex-shrink: 0;
+  color: var(--on-surface-variant);
+  font-size: 1.25rem;
+}
+
+/* Dark mode — home screen */
+.dark .home-greeting__day         { background: var(--primary-container); color: var(--on-primary-container); }
+.dark .home-nav-btn               { background: var(--surface-container-low); color: var(--on-surface-variant); }
+.dark .home-nav-btn:hover         { background: var(--surface-container); color: var(--on-surface); }
+.dark .home-quick-card            { background: var(--surface-container-lowest); box-shadow: var(--shadow-card); }
+.dark .home-quick-card:hover      { background: var(--surface-container-low); }
+.dark .home-featured-position     { background: var(--surface-container-lowest); }
+.dark .home-featured-position:hover { background: var(--surface-container-low); }
+.dark .home-featured-position__icon { background: var(--primary-container); color: var(--on-primary-container); }
+
+
+/* ══════════════════════════════════════════════════════════════
+   CANDLELIGHT DARK MODE
+   ──────────────────────────────────────────────────────────────
+   Designed for the 3am feed.
+   A mother checking this at night has one hand on her baby,
+   tired eyes, and a screen 30cm from her face.
+
+   Rules:
+   • No blue tones anywhere — warm brown-blacks only
+   • Text at ~85% cream brightness — not stark white
+   • Primary / secondary desaturated — less stimulating
+   • Shadows removed — noise reduction for tired eyes
+   • Touch targets breathe slightly bigger via padding boost
+   • Animations 20% slower — brain processes slower at 3am
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Dark mode CSS custom property overrides ────────────────── */
+.dark {
+  /* Surfaces — warm brown layers, like a lamplit room */
+  --surface:                   #1c1713;
+  --surface-dim:               #141009;
+  --surface-container-lowest:  #231c16;
+  --surface-container-low:     #2a2218;
+  --surface-container:         #302820;
+  --surface-container-high:    #372e24;
+  --surface-container-highest: #3f342a;
+  --surface-variant:           #3f342a;
+
+  /* Primary — sage, lightened + desaturated for night */
+  --primary:             #8fb88a;   /* readable sage, not stimulating bright */
+  --primary-container:   #1d3320;   /* dark forest — used for badges */
+  --primary-dim:         #6a9666;
+  --on-primary:          #0e2010;
+  --on-primary-container:#a8d4a2;
+
+  /* Secondary — rose, muted for night */
+  --secondary:           #c49690;
+  --secondary-container: #3d2420;
+  --on-secondary:        #2a100d;
+  --on-secondary-container: #e8b8b2;
+
+  /* Text — warm cream, never pure white */
+  --background:          #1c1713;
+  --on-background:       #ede0ce;   /* warm cream */
+  --on-surface:          #ede0ce;
+  --on-surface-variant:  #a08870;   /* muted warm tan */
+  --outline:             #6a5a4a;
+  --outline-variant:     #4a3e34;
+
+  /* Severity — night-adapted: lower saturation, easier to read */
+  --severity-red-bg:     #3a1810;
+  --severity-red-text:   #f0a090;
+  --severity-yellow-bg:  #3a2808;
+  --severity-yellow-text:#d4a050;
+  --severity-green-bg:   #1a2d18;
+  --severity-green-text: #80c070;
+
+  /* Shadows — near-invisible at night (remove visual noise) */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-nav:  0 -2px 12px rgba(0, 0, 0, 0.40);
+}
+
+/* ── Body ───────────────────────────────────────────────────── */
+.dark body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+}
+
+/* ── Top bar — warm translucent brown ──────────────────────── */
+.dark #top-bar {
+  background: rgba(28, 23, 19, 0.90);   /* warm brown, not cold black */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 rgba(80, 60, 40, 0.20);
+}
+
+/* ── Bottom nav — same warm brown family ───────────────────── */
+.dark #bottom-nav {
+  background: rgba(28, 23, 19, 0.94);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* Active symptoms pill in dark mode */
+.dark #nav-symptoms {
+  background-color: rgba(29, 51, 32, 0.70);  /* dark-primary-container */
+  color: var(--primary);
+}
+
+/* ── Cards — warm brown card face ──────────────────────────── */
+.dark .symptom-card {
+  background-color: var(--surface-container-lowest);
+  box-shadow: var(--shadow-card);
+}
+
+.dark .symptom-card:hover {
+  background-color: var(--surface-container-low);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+.dark .symptom-card__category {
+  color: rgba(143, 184, 138, 0.70);   /* dark-primary at 70% */
+}
+
+.dark .symptom-card__title {
+  color: var(--on-surface);
+}
+
+.dark .symptom-card__clinical {
+  color: var(--on-surface-variant);
+}
+
+.dark .symptom-card__action {
+  color: var(--primary);
+}
+
+/* ── Encouragement banner ───────────────────────────────────── */
+.dark .encouragement-banner {
+  background-color: rgba(61, 36, 32, 0.35);  /* secondary-container dark */
+}
+
+.dark .encouragement-banner h4 {
+  color: var(--secondary);
+}
+
+.dark .encouragement-banner p {
+  color: var(--on-secondary-container);
+}
+
+/* ── Severity pills — night palette ────────────────────────── */
+.dark .severity-pill--red {
+  background-color: var(--severity-red-bg);
+  color: var(--severity-red-text);
+}
+
+.dark .severity-pill--yellow {
+  background-color: var(--severity-yellow-bg);
+  color: var(--severity-yellow-text);
+}
+
+.dark .severity-pill--green {
+  background-color: var(--severity-green-bg);
+  color: var(--severity-green-text);
+}
+
+/* ── Symptom detail screen ──────────────────────────────────── */
+.dark .detail-back-btn {
+  color: var(--primary);
+}
+
+.dark .detail-title {
+  color: var(--on-background);
+}
+
+.dark .detail-clinical {
+  color: var(--on-surface-variant);
+}
+
+.dark .detail-intro-card {
+  background-color: var(--surface-container-low);
+  border-color: transparent;
+}
+
+.dark .detail-intro-card h3 {
+  color: var(--on-surface);
+}
+
+.dark .detail-intro-card p {
+  color: var(--on-surface-variant);
+}
+
+/* ── Step cards ─────────────────────────────────────────────── */
+.dark .step-card {
+  background-color: var(--surface-container-low);
+}
+
+.dark .step-number {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.dark .step-title {
+  color: var(--on-surface);
+}
+
+.dark .step-desc {
+  color: var(--on-surface-variant);
+}
+
+.dark .step-tip {
+  background-color: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+/* ── Do's and Don'ts ────────────────────────────────────────── */
+.dark .dos-box {
+  background-color: var(--primary-container);
+}
+
+.dark .dos-box__header {
+  color: var(--on-primary-container);
+}
+
+.dark .donts-box {
+  background-color: var(--secondary-container);
+}
+
+.dark .donts-box__header {
+  color: var(--on-secondary-container);
+}
+
+/* ── Red flags callout ──────────────────────────────────────── */
+.dark .red-flags-box {
+  background-color: var(--severity-red-bg);
+  border-color: transparent;
+}
+
+.dark .red-flags-box__header {
+  color: var(--severity-red-text);
+}
+
+.dark .red-flags-box ul li {
+  color: #e8b0a0;
+}
+
+/* ── Improvement block ──────────────────────────────────────── */
+.dark .improvement-block {
+  background-color: var(--surface-container-low);
+  border-color: transparent;
+}
+
+/* ── Category badge ─────────────────────────────────────────── */
+.dark .category-badge {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
+
+/* ── Disclaimer footer ──────────────────────────────────────── */
+.dark .disclaimer-footer .disclaimer-label {
+  color: var(--outline);
+}
+
+.dark .disclaimer-footer p {
+  color: var(--on-surface-variant);
+  opacity: 0.7;
+}
+
+/* ── Reviewer badge ─────────────────────────────────────────── */
+.dark .reviewer-badge {
+  background: var(--primary-container);
+}
+
+.dark .reviewer-badge__name {
+  color: var(--on-primary-container);
+}
+
+.dark .reviewer-badge__meta {
+  color: var(--on-surface-variant);
+}
+
+.dark .reviewer-pending {
+  color: var(--outline);
+}
+
+/* ── Positions list ─────────────────────────────────────────── */
+.dark .position-card {
+  background-color: var(--surface-container-lowest);
+  box-shadow: var(--shadow-card);
+}
+
+.dark .position-card:hover {
+  background-color: var(--surface-container-low);
+}
+
+.dark .position-card__icon {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.dark .position-card__difficulty {
+  color: var(--on-surface-variant);
+}
+
+.dark .position-card__title {
+  color: var(--on-surface);
+}
+
+.dark .position-card__tagline {
+  color: var(--on-surface-variant);
+}
+
+.dark .position-card__action {
+  color: var(--primary);
+}
+
+.dark .best-for-tag {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+/* ── Position detail ────────────────────────────────────────── */
+.dark .position-detail-hero {
+  background-color: var(--surface-container-low);
+}
+
+.dark .position-detail-hero__icon {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.dark .mistake-card {
+  background-color: var(--surface-container-low);
+  border-color: transparent;
+}
+
+.dark .mistake-card__label {
+  color: var(--on-surface-variant);
+}
+
+.dark .mistake-card__mistake {
+  color: var(--on-surface);
+}
+
+.dark .mistake-card__fix-label {
+  color: var(--primary);
+}
+
+.dark .mistake-card__fix {
+  color: var(--on-surface-variant);
+}
+
+.dark .latch-checklist li {
+  background-color: var(--surface-container-low);
+  color: var(--on-surface);
+}
+
+.dark .latch-checklist li.is-checked {
+  background-color: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.dark .not-ideal-box {
+  background-color: var(--surface-container);
+  border-color: transparent;
+}
+
+.dark .not-ideal-box__header {
+  color: var(--on-surface-variant);
+}
+
+/* ── Chat / Coach screen ────────────────────────────────────── */
+.dark .chat-screen {
+  background-color: var(--surface);
+}
+
+.dark .chat-messages {
+  background-color: var(--surface);
+}
+
+.dark .chat-bubble--user {
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+}
+
+.dark .chat-bubble--coach {
+  background-color: var(--surface-container-low);
+  color: var(--on-surface);
+}
+
+.dark .chat-input-bar {
+  background-color: var(--surface);
+  border-top-color: rgba(80, 60, 40, 0.25);
+}
+
+.dark .chat-input-row {
+  background-color: var(--surface-container-low);
+}
+
+.dark .chat-input-row textarea {
+  color: var(--on-surface);
+}
+
+.dark .chat-input-row textarea::placeholder {
+  color: var(--on-surface-variant);
+}
+
+.dark .chat-send-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dim) 100%);
+  color: var(--on-primary);
+}
+
+.dark .coach-coming-soon {
+  background-color: var(--surface-container-high);
+  color: var(--on-surface-variant);
+}
+
+.dark .chat-escalation {
+  background-color: var(--severity-red-bg);
+  border-color: transparent;
+}
+
+.dark .chat-escalation__header {
+  color: var(--severity-red-text);
+}
+
+.dark .chat-escalation__action {
+  background-color: var(--surface-container-low);
+}
+
+.dark .chat-escalation__action-label {
+  color: var(--on-surface);
+}
+
+.dark .chat-escalation__action-detail {
+  color: var(--on-surface-variant);
+}
+
+/* ── Loading skeleton — warm tinted in dark mode ───────────── */
+.dark .skeleton-pulse {
+  background-color: var(--surface-container-high);
+  opacity: 0.6;
+}
+
+/* ── Error state ────────────────────────────────────────────── */
+.dark .detail-section-header h3 {
+  color: var(--on-surface);
+}
+
+/* ── Animations — 20% slower at night (less jarring) ────────── */
+.dark .screen-enter {
+  animation-duration: 360ms;  /* default 300ms → 360ms */
+}
+
+.dark .skeleton-pulse {
+  animation-duration: 2.4s;   /* default 2s → 2.4s — slower breathing */
+}
+
+/* ── Ambient background glows — warmer in dark mode ────────── */
+.dark ~ [aria-hidden="true"]:first-of-type {
+  background: rgba(29, 51, 32, 0.12);   /* dark primary glow */
+}
+
+.dark ~ [aria-hidden="true"]:last-of-type {
+  background: rgba(61, 36, 32, 0.08);   /* dark secondary glow */
+}

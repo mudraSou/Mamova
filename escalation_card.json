@@ -1,0 +1,120 @@
+{
+  "id": "escalation",
+  "slug": "escalation",
+  "type": "escalation",
+  "reviewed_by": "[IBCLC name — fill before launch]",
+  "last_reviewed_at": "2026-04-10T00:00:00Z",
+
+  "categories": {
+
+    "infection": {
+      "title": "This needs medical attention today",
+      "icon": "local_hospital",
+      "severity": "red",
+      "body": "What you've described — fever, red streaks, or a hot painful breast — are signs that may need treatment today, not tomorrow. Mastitis and breast abscesses can progress quickly.",
+      "actions": [
+        {
+          "priority": 1,
+          "label": "Call your doctor or midwife now",
+          "detail": "Describe your symptoms exactly. Ask about antibiotics if you have fever + a hard, hot, red area."
+        },
+        {
+          "priority": 2,
+          "label": "If you can't reach them, go to urgent care",
+          "detail": "Don't wait to see if it improves on its own when fever is involved."
+        },
+        {
+          "priority": 3,
+          "label": "Keep feeding or pumping if you can",
+          "detail": "Stopping milk removal makes engorgement and infection worse. Breastfeeding with mastitis is safe for your baby."
+        }
+      ],
+      "reassurance": "Getting treatment doesn't mean you have to stop breastfeeding. Most mothers continue successfully after treatment.",
+      "disclaimer": "This is not a diagnosis. Only a healthcare provider can evaluate and treat a breast infection."
+    },
+
+    "bleeding": {
+      "title": "Bleeding needs to be checked",
+      "icon": "emergency",
+      "severity": "red",
+      "body": "Cracked nipples that bleed are painful but usually manageable. However, heavy bleeding, blood in your milk, or a wound that won't heal needs a professional to look at it.",
+      "actions": [
+        {
+          "priority": 1,
+          "label": "Contact a lactation consultant (IBCLC)",
+          "detail": "Cracked and bleeding nipples are almost always a latch problem. An IBCLC can fix the latch in one session and stop the damage."
+        },
+        {
+          "priority": 2,
+          "label": "Call your doctor if the wound looks open or infected",
+          "detail": "Signs: yellow or green discharge, smell, skin pulling apart, increasing pain after day 5."
+        }
+      ],
+      "reassurance": "Bleeding nipples are one of the most common reasons mothers stop breastfeeding — and one of the most fixable with the right help.",
+      "disclaimer": "This is not a diagnosis. A healthcare provider or IBCLC should assess any bleeding that concerns you."
+    },
+
+    "mental_health": {
+      "title": "Please reach out right now",
+      "icon": "favorite",
+      "severity": "red",
+      "body": "What you're feeling is real, and you deserve support immediately. Thoughts of harming yourself or your baby are a medical emergency — not a sign that you're a bad mother.",
+      "actions": [
+        {
+          "priority": 1,
+          "label": "Call or text a crisis line now",
+          "detail": "iCall (India): 9152987821 · Vandrevala Foundation: 1860-2662-345 (24/7) · International: findahelpline.com"
+        },
+        {
+          "priority": 2,
+          "label": "Tell someone you trust right now",
+          "detail": "Your partner, mother, a friend — anyone. Don't be alone with these thoughts."
+        },
+        {
+          "priority": 3,
+          "label": "Call your doctor or go to the nearest hospital",
+          "detail": "Tell them exactly what you told us. Postpartum mental health crises are treated and recoverable."
+        }
+      ],
+      "reassurance": "1 in 5 mothers experience postpartum depression or anxiety. You are not alone, and this is not your fault.",
+      "disclaimer": "If you are in immediate danger, call emergency services (112 in India, 911 in US/Canada)."
+    },
+
+    "baby_emergency": {
+      "title": "Your baby needs emergency care now",
+      "icon": "emergency",
+      "severity": "red",
+      "body": "The signs you've described in your baby need immediate medical evaluation. Do not wait.",
+      "actions": [
+        {
+          "priority": 1,
+          "label": "Call emergency services or go to the nearest hospital now",
+          "detail": "112 in India · 911 in US/Canada · 999 in UK. Tell them your baby's age and the symptoms."
+        }
+      ],
+      "reassurance": null,
+      "disclaimer": "Do not delay emergency care for a newborn or infant showing signs of distress."
+    },
+
+    "default": {
+      "title": "This sounds like it needs a professional",
+      "icon": "local_hospital",
+      "severity": "red",
+      "body": "What you've described is outside what we can safely guide you through here. Please contact your doctor, midwife, or a certified lactation consultant (IBCLC) today.",
+      "actions": [
+        {
+          "priority": 1,
+          "label": "Call your doctor or midwife",
+          "detail": "Describe your symptoms exactly as you described them here."
+        },
+        {
+          "priority": 2,
+          "label": "Find an IBCLC near you",
+          "detail": "ilca.org/find-a-lactation-consultant — international directory."
+        }
+      ],
+      "reassurance": "Asking for help is the right call. This app is for guidance — not a replacement for care when you need it.",
+      "disclaimer": "This is not a diagnosis. Always consult a qualified healthcare provider for medical concerns."
+    }
+  }
+}

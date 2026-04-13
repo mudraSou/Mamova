@@ -1,0 +1,24 @@
+[
+  {
+    "id": "r1",
+    "name": "Dr. [First Last]",
+    "title": "Dr.",
+    "credentials": ["MBBS", "MD", "IBCLC"],
+    "specialization": "Pediatrics",
+    "hospital": "",
+    "city": "",
+    "active": true,
+    "added_at": null
+  },
+  {
+    "id": "r2",
+    "name": "Dr. [First Last]",
+    "title": "Dr.",
+    "credentials": ["MBBS", "MD"],
+    "specialization": "Gynecology",
+    "hospital": "",
+    "city": "",
+    "active": true,
+    "added_at": null
+  }
+]
