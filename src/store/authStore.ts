@@ -18,12 +18,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
 
   initialize: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    set({ session, user: session?.user ?? null, isLoading: false });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      set({ session, user: session?.user ?? null, isLoading: false });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      set({ session, user: session?.user ?? null });
-    });
+      supabase.auth.onAuthStateChange((_event, session) => {
+        set({ session, user: session?.user ?? null });
+      });
+    } catch {
+      set({ session: null, user: null, isLoading: false });
+    }
   },
 
   sendMagicLink: async (email) => {

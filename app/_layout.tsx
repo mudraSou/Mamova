@@ -41,7 +41,7 @@ export default function RootLayout() {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded) return null; // fonts load fast from bundle; no indefinite block
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
