@@ -1,5 +1,5 @@
 import React from 'react';
-import { type NavigatorScreenParams } from '@react-navigation/native';
+import { NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet, Platform } from 'react-native';
@@ -118,18 +118,20 @@ export function RootNavigator() {
   if (isLoading) return null;
 
   return (
-    <Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
-      {!session ? (
-        <>
-          <Root.Screen name="Welcome" component={WelcomeScreen} />
-          <Root.Screen name="Login"   component={LoginScreen} />
-        </>
-      ) : !profile ? (
-        <Root.Screen name="Onboarding" component={OnboardingScreen} />
-      ) : (
-        <Root.Screen name="Main" component={MainTabs} />
-      )}
-    </Root.Navigator>
+    <NavigationContainer>
+      <Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+        {!session ? (
+          <>
+            <Root.Screen name="Welcome" component={WelcomeScreen} />
+            <Root.Screen name="Login"   component={LoginScreen} />
+          </>
+        ) : !profile ? (
+          <Root.Screen name="Onboarding" component={OnboardingScreen} />
+        ) : (
+          <Root.Screen name="Main" component={MainTabs} />
+        )}
+      </Root.Navigator>
+    </NavigationContainer>
   );
 }
 
