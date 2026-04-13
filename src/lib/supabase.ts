@@ -1,22 +1,31 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
-import * as SecureStore from 'expo-secure-store';
-import { AppState } from 'react-native';
+import { Platform, AppState } from 'react-native';
 
 // ── Env vars — set in .env or eas.json secrets ────────────────────
 const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL  ?? '';
 const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON ?? '';
 
-// ── Secure token storage (replaces localStorage on native) ───────
-const ExpoSecureStoreAdapter = {
-  getItem:    (key: string) => SecureStore.getItemAsync(key),
-  setItem:    (key: string, value: string) => SecureStore.setItemAsync(key, value),
-  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+// ── Storage adapter — SecureStore on native, localStorage on web ──
+const getStorageAdapter = () => {
+  if (Platform.OS === 'web') {
+    return {
+      getItem:    (key: string) => Promise.resolve(localStorage.getItem(key)),
+      setItem:    (key: string, value: string) => Promise.resolve(localStorage.setItem(key, value)),
+      removeItem: (key: string) => Promise.resolve(localStorage.removeItem(key)),
+    };
+  }
+  const SecureStore = require('expo-secure-store');
+  return {
+    getItem:    (key: string) => SecureStore.getItemAsync(key),
+    setItem:    (key: string, value: string) => SecureStore.setItemAsync(key, value),
+    removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+  };
 };
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
-    storage: ExpoSecureStoreAdapter,
+    storage: getStorageAdapter(),
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
