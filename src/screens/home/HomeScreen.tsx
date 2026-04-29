@@ -130,7 +130,7 @@ export function HomeScreen() {
           )}
 
           {/* ── Affirmation ───────────────────────────────────── */}
-          <LinearGradient colors={['rgba(124,58,237,0.15)', 'rgba(192,132,252,0.08)']}
+          <LinearGradient colors={['rgba(212,118,106,0.12)', 'rgba(94,158,148,0.08)']}
                           style={styles.affirmation}>
             <Text style={styles.affirmTitle}>You showed up. That's everything.</Text>
             <Text style={styles.affirmBody}>
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 4,
     borderRadius: radius.full,
   },
-  dayBadgeText: { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.dark.bg, textTransform: 'uppercase', letterSpacing: 1.2 },
+  dayBadgeText: { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.darkText.primary, textTransform: 'uppercase', letterSpacing: 1.2 },
   greetTitle: { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes['3xl'], color: palette.darkText.primary, lineHeight: typography.sizes['3xl'] * 1.2 },
   greetSub:   { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.secondary },
 

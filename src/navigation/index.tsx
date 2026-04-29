@@ -81,7 +81,7 @@ function MainTabs() {
         tabBarBackground: () => (
           Platform.OS === 'ios'
             ? <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
-            : <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(26,17,51,0.96)' }]} />
+            : <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(253,248,243,0.95)' }]} />
         ),
         tabBarLabel: ({ focused }) => (
           <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>

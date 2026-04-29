@@ -2,65 +2,64 @@
  * Mamova Design System — Color Tokens
  * "You birthed life. Now reclaim yours."
  *
- * Palette family: Deep violet → Electric purple → Soft fuchsia → Light blush
- * Philosophy: Dark-first. The app feels like a private, empowering space —
- * not a clinical tool. Rich violet atmosphere, never cold.
+ * Palette family: Warm ivory → Dusty coral → Sage teal → Mint frost
+ * Philosophy: Light and airy. Warm like morning light; cool like a deep breath.
+ * Not clinical. Not cold. Honest and gentle.
  */
 
 export const palette = {
-  // ── Brand spectrum ───────────────────────────────────────────
-  deepViolet:      '#1a1133',   // primary dark surface
-  violetDark:      '#130d26',   // deeper — used for overlays, modals
-  violetMid:       '#2d1b69',   // mid-depth surface
-  electricPurple:  '#7c3aed',   // primary action color
-  electricDim:     '#6d28d9',   // pressed state
-  softFuchsia:     '#c084fc',   // secondary accent
-  lightBlush:      '#f0abfc',   // highlights, pills, warm accents
-  blushDim:        '#e879f9',   // pressed blush
+  // ── Warm tones ───────────────────────────────────────────────
+  deepViolet:      '#fdf2e9',   // warm ivory — main background canvas
+  violetDark:      '#f7e8d8',   // slightly deeper warm
+  violetMid:       '#edc9b0',   // warm sand-tan — mid surfaces
+  electricPurple:  '#d4766a',   // dusty coral-rose — primary action
+  electricDim:     '#bc5d52',   // deep coral — pressed state
+  softFuchsia:     '#5e9e94',   // dusty sage-teal — secondary accent
+  lightBlush:      '#f0a080',   // warm peach — highlights, active states
+  blushDim:        '#e0906a',   // peach pressed
 
-  // ── Surface layers (dark theme) ──────────────────────────────
+  // ── Surface layers (warm light theme) ───────────────────────
   dark: {
-    bg:       '#1a1133',   // root background
-    surface0: '#1f1540',   // one step up
-    surface1: '#261a4d',   // card background
-    surface2: '#2d1f5a',   // elevated card
-    surface3: '#361f6b',   // tooltip, popover
-    overlay:  'rgba(26, 17, 51, 0.82)',  // modal scrim
-  },
-
-  // ── Surface layers (light theme) ────────────────────────────
-  light: {
-    bg:       '#faf5ff',   // warm violet-tinted white
-    surface0: '#f3e8ff',   // subtle purple wash
+    bg:       '#fdf8f3',   // warm white — root background
+    surface0: '#faf2ea',   // barely warm step up
     surface1: '#ffffff',   // card face
-    surface2: '#f5f3ff',   // elevated card
-    surface3: '#ede9fe',   // tag, chip background
-    overlay:  'rgba(26, 17, 51, 0.60)',
+    surface2: '#fdf0e8',   // elevated card — subtle warmth
+    surface3: '#edd8cc',   // borders, chips
+    overlay:  'rgba(60, 35, 25, 0.45)',
   },
 
-  // ── Text (dark theme) ────────────────────────────────────────
+  // ── Surface layers (alternate) ──────────────────────────────
+  light: {
+    bg:       '#fdf8f3',
+    surface0: '#f5ebe0',
+    surface1: '#ffffff',
+    surface2: '#f5f0ec',
+    surface3: '#e8ddd5',
+    overlay:  'rgba(60, 35, 25, 0.50)',
+  },
+
+  // ── Text ─────────────────────────────────────────────────────
   darkText: {
-    primary:   '#f5f0ff',   // near-white, warm violet tint
-    secondary: '#c4b5fd',   // muted purple-white
-    muted:     '#7c6fa0',   // dim
-    inverse:   '#1a1133',   // dark text on light surfaces
+    primary:   '#2c1a10',   // warm near-black
+    secondary: '#7a4e3c',   // warm medium brown
+    muted:     '#b08878',   // warm muted
+    inverse:   '#fdf8f3',   // light text (for any dark surfaces)
   },
 
-  // ── Text (light theme) ───────────────────────────────────────
   lightText: {
-    primary:   '#1a1133',
-    secondary: '#4c1d95',
-    muted:     '#7c3aed',
-    inverse:   '#f5f0ff',
+    primary:   '#2c1a10',
+    secondary: '#7a4e3c',
+    muted:     '#b08878',
+    inverse:   '#fdf8f3',
   },
 
   // ── Semantic ─────────────────────────────────────────────────
-  urgent:       '#f87171',   // red flag — warm, not clinical
-  urgentBg:     '#3f1515',
-  attention:    '#fbbf24',   // yellow
-  attentionBg:  '#3f2a00',
-  safe:         '#86efac',   // green — reassuring
-  safeBg:       '#052e16',
+  urgent:       '#d95a48',   // warm red
+  urgentBg:     '#fde8e4',   // soft warm red wash
+  attention:    '#d49058',   // warm amber
+  attentionBg:  '#fdf0e0',   // soft amber wash
+  safe:         '#5a9e78',   // sage green
+  safeBg:       '#e0f5e8',   // soft green wash
 
   // ── Always ───────────────────────────────────────────────────
   white:       '#ffffff',
@@ -70,20 +69,20 @@ export const palette = {
 
 // ── Gradient presets ─────────────────────────────────────────────
 export const gradients = {
-  // Main hero gradient — violet to fuchsia
-  brand: ['#1a1133', '#7c3aed'] as const,
-  brandReverse: ['#7c3aed', '#1a1133'] as const,
+  // Warm coral → cool sage
+  brand: ['#d4766a', '#5e9e94'] as const,
+  brandReverse: ['#5e9e94', '#d4766a'] as const,
 
-  // Button gradient
-  button: ['#7c3aed', '#c084fc'] as const,
-  buttonPressed: ['#6d28d9', '#a855f7'] as const,
+  // Button — warm coral to peach
+  button: ['#d4766a', '#f0a080'] as const,
+  buttonPressed: ['#bc5d52', '#d4766a'] as const,
 
-  // Card gradient — subtle depth
-  card: ['#261a4d', '#1f1540'] as const,
+  // Card — clean white to warm
+  card: ['#ffffff', '#fdf0e8'] as const,
 
-  // Fuchsia highlight — used for banners, CTAs
-  fuchsia: ['#c084fc', '#f0abfc'] as const,
+  // Warm peach accent — used for banners, badges, CTAs
+  fuchsia: ['#f5c0b0', '#f0a080'] as const,
 
-  // Splash / onboarding full-screen
-  splash: ['#1a1133', '#2d1b69', '#4c1d95'] as const,
+  // Splash / onboarding — warm cream → dusty rose → cool sage mist
+  splash: ['#fdf2e9', '#f0c8b8', '#bcd8d4'] as const,
 } as const;
