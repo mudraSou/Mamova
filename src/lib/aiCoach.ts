@@ -1,17 +1,44 @@
 /**
- * Mamova AI Coach — Phase 3
+ * Mamova AI Coach
  * Primary:  Gemini 1.5 Flash
  * Fallback: Groq (llama-3.3-70b-versatile)
- * Both via plain fetch — no SDK, works in React Native.
+ * Both via plain fetch — no SDK, works in React Native + web.
  *
- * Call order: Gemini → Groq → throw
- * Safety gate (safety.ts) must run BEFORE calling this module.
+ * Safety gate (safety.ts) must run BEFORE calling askCoach.
  */
 
 import Constants from 'expo-constants';
 
-// ── System prompt ─────────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are Mamova, a warm and knowledgeable breastfeeding coach for new mothers in the first 40 days after birth.
+// ── Types ─────────────────────────────────────────────────────────
+export type ChatMessage = { role: 'user' | 'coach'; text: string };
+
+export type ProfileContext = {
+  dayN: number;
+  isCSection: boolean;
+  babyName: string | null;
+};
+
+// ── Dynamic system prompt ─────────────────────────────────────────
+function buildSystemPrompt(ctx?: ProfileContext): string {
+  const contextBlock = ctx ? [
+    'Context about the mother you are speaking with:',
+    `- She is on Day ${ctx.dayN} postpartum (Day 1 = birth day).`,
+    ctx.isCSection
+      ? '- She had a C-section. Avoid suggestions that put pressure on the abdomen. Be mindful of her surgical recovery.'
+      : '- She had a vaginal delivery.',
+    ctx.babyName
+      ? `- Her baby's name is ${ctx.babyName}. Use their name naturally in your responses.`
+      : '',
+    ctx.dayN <= 5
+      ? '- She is in the most vulnerable early days. Be especially gentle and reassuring.'
+      : ctx.dayN <= 14
+        ? '- She is in the first two weeks — milk supply is establishing and emotions run high.'
+        : '',
+    `Use this context naturally. Mention Day ${ctx.dayN} when relevant. Don't force it.`,
+    '',
+  ].filter(Boolean).join('\n') : '';
+
+  return `${contextBlock}You are Mamova — a warm, honest breastfeeding and postpartum coach for new mothers in the first 40 days after birth.
 
 The mother talking to you is likely exhausted — possibly feeding at 3am. Keep your answers short, warm, and kind.
 
@@ -23,31 +50,30 @@ Your rules:
 - Maximum 3 short paragraphs per response. No bullet lists — this is a warm conversation, not a manual.
 - End with a brief encouraging line when it feels right.
 - Never diagnose conditions, prescribe medication, or advise against seeking professional help.`;
-
-// ── Types ─────────────────────────────────────────────────────────
-export type ChatMessage = { role: 'user' | 'coach'; text: string };
+}
 
 // ── Gemini ────────────────────────────────────────────────────────
-function buildGeminiBody(history: ChatMessage[], message: string) {
-  const contents = history.slice(-6).map(m => ({
+async function callGemini(
+  history: ChatMessage[],
+  message: string,
+  apiKey: string,
+  systemPrompt: string,
+): Promise<string> {
+  const contents = history.slice(-8).map(m => ({
     role: m.role === 'user' ? 'user' : 'model',
     parts: [{ text: m.text }],
   }));
   contents.push({ role: 'user', parts: [{ text: message }] });
 
-  return JSON.stringify({
-    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-    contents,
-    generationConfig: { maxOutputTokens: 512, temperature: 0.75 },
-  });
-}
-
-async function callGemini(history: ChatMessage[], message: string, apiKey: string): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: buildGeminiBody(history, message),
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents,
+      generationConfig: { maxOutputTokens: 512, temperature: 0.75 },
+    }),
   });
   if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
   const data = await res.json();
@@ -57,18 +83,21 @@ async function callGemini(history: ChatMessage[], message: string, apiKey: strin
 }
 
 // ── Groq ──────────────────────────────────────────────────────────
-function buildGroqMessages(history: ChatMessage[], message: string) {
-  const msgs: { role: string; content: string }[] = [
-    { role: 'system', content: SYSTEM_PROMPT },
+async function callGroq(
+  history: ChatMessage[],
+  message: string,
+  apiKey: string,
+  systemPrompt: string,
+): Promise<string> {
+  const messages: { role: string; content: string }[] = [
+    { role: 'system', content: systemPrompt },
+    ...history.slice(-8).map(m => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.text,
+    })),
+    { role: 'user', content: message },
   ];
-  history.slice(-6).forEach(m => {
-    msgs.push({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text });
-  });
-  msgs.push({ role: 'user', content: message });
-  return msgs;
-}
 
-async function callGroq(history: ChatMessage[], message: string, apiKey: string): Promise<string> {
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -77,7 +106,7 @@ async function callGroq(history: ChatMessage[], message: string, apiKey: string)
     },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
-      messages: buildGroqMessages(history, message),
+      messages,
       max_tokens: 512,
       temperature: 0.75,
     }),
@@ -90,25 +119,24 @@ async function callGroq(history: ChatMessage[], message: string, apiKey: string)
 }
 
 // ── Public entry point ────────────────────────────────────────────
-export async function askCoach(history: ChatMessage[], message: string): Promise<string> {
+export async function askCoach(
+  history: ChatMessage[],
+  message: string,
+  ctx?: ProfileContext,
+): Promise<string> {
+  const systemPrompt = buildSystemPrompt(ctx);
   const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, string>;
   const geminiKey = extra.geminiApiKey ?? '';
   const groqKey   = extra.groqApiKey   ?? '';
 
   if (geminiKey) {
-    try {
-      return await callGemini(history, message, geminiKey);
-    } catch (e) {
-      // fall through to Groq
-    }
+    try { return await callGemini(history, message, geminiKey, systemPrompt); }
+    catch { /* fall through to Groq */ }
   }
 
   if (groqKey) {
-    try {
-      return await callGroq(history, message, groqKey);
-    } catch (e) {
-      // fall through to error
-    }
+    try { return await callGroq(history, message, groqKey, systemPrompt); }
+    catch { /* fall through to error */ }
   }
 
   throw new Error('no_provider');

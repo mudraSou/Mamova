@@ -13,7 +13,6 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { RootNavigator } from '@/navigation';
-import { useAuthStore } from '@/store/authStore';
 import { useProfileStore } from '@/store/profileStore';
 
 SplashScreen.preventAutoHideAsync();
@@ -28,20 +27,15 @@ export default function RootLayout() {
     PlusJakartaSans_700Bold,
   });
 
-  const { initialize, session } = useAuthStore();
-  const { fetchProfile }        = useProfileStore();
+  const { initialize } = useProfileStore();
 
   useEffect(() => { initialize(); }, []);
-
-  useEffect(() => {
-    if (session?.user) fetchProfile(session.user.id);
-  }, [session]);
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null; // fonts load fast from bundle; no indefinite block
+  if (!fontsLoaded) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

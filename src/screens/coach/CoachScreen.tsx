@@ -6,8 +6,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { isSafeToCoach, classifyEscalation, getMatchedFlags } from '@/lib/safety';
-import { askCoach, type ChatMessage } from '@/lib/aiCoach';
+import { isSafeToCoach, classifyEscalation } from '@/lib/safety';
+import { askCoach, type ChatMessage, type ProfileContext } from '@/lib/aiCoach';
+import { useProfileStore, calcDayN } from '@/store/profileStore';
 import { palette, typography, spacing, radius, shadows, gradients } from '@/theme';
 import escalationData from '@/data/escalation.json';
 
@@ -19,10 +20,51 @@ const ESCALATION = (escalationData as any).categories as Record<string, {
 type Msg = { id: string; role: 'user' | 'coach' | 'escalation'; text?: string; category?: string };
 
 const PROMPTS = [
-  'My baby keeps slipping off during a feed — help?',
-  'How do I know if my baby is getting enough milk?',
-  'My nipples hurt every time I latch.',
+  "My baby keeps slipping off during a feed — help?",
+  "How do I know if my baby is getting enough milk?",
+  "My nipples hurt every time I latch.",
+  "I feel like I'm failing at this. Is that normal?",
 ];
+
+// ── Persistence (web only — SecureStore byte limit too small for chat) ──
+const COACH_MESSAGES_KEY = 'mamova_coach_messages';
+
+function loadPersistedMessages(): Msg[] {
+  if (Platform.OS !== 'web') return [];
+  try {
+    const raw = localStorage.getItem(COACH_MESSAGES_KEY);
+    return raw ? (JSON.parse(raw) as Msg[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistMessages(msgs: Msg[]): void {
+  if (Platform.OS !== 'web') return;
+  try {
+    localStorage.setItem(COACH_MESSAGES_KEY, JSON.stringify(msgs.slice(-50)));
+  } catch { /* storage full — silently skip */ }
+}
+
+// ── Welcome message (template, no AI call) ────────────────────────
+function buildWelcome(
+  babyName: string | null,
+  day: number,
+  csection: boolean,
+): string {
+  const nameStr = babyName ? ` and ${babyName}` : '';
+
+  if (day <= 3) {
+    return `Hi${nameStr}. Day ${day} — the very beginning. These first days are tender and hard in ways nobody fully prepares you for.\n\nI'm here for any question about feeding, your body, or how you're feeling. Nothing is too small.`;
+  }
+  if (day <= 7) {
+    return `Hi${nameStr}. Day ${day} — your milk is coming in${csection ? ' while you recover from surgery' : ''}. There's a lot happening in your body right now.\n\nAsk me anything. I'm here at any hour.`;
+  }
+  if (day <= 14) {
+    return `Hi${nameStr}. Day ${day} — you're finding your rhythm.\n\nI'm here for breastfeeding questions, recovery, or just to talk through how things are going.`;
+  }
+  return `Hi${nameStr}. I'm Mamova — your breastfeeding and postpartum coach.\n\nAsk me anything about feeding, recovery, or how you're feeling.`;
+}
 
 // ── Typing indicator ──────────────────────────────────────────────
 function TypingIndicator() {
@@ -61,7 +103,9 @@ function TypingIndicator() {
 
 // ── Screen ────────────────────────────────────────────────────────
 export function CoachScreen() {
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const { profile, dayN, isCSection } = useProfileStore();
+
+  const [messages, setMessages] = useState<Msg[]>(() => loadPersistedMessages());
   const [input, setInput]       = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const listRef = useRef<FlatList>(null);
@@ -69,8 +113,25 @@ export function CoachScreen() {
   const scrollToEnd = () =>
     setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
 
+  // ── Personalized welcome on first open ──────────────────────────
+  useEffect(() => {
+    if (messages.length === 0) {
+      const day   = profile?.delivery_date ? calcDayN(profile.delivery_date) : 1;
+      const csect = profile?.delivery_type === 'c-section';
+      const text  = buildWelcome(profile?.baby_name ?? null, day, csect);
+      setMessages([{ id: 'welcome', role: 'coach', text }]);
+      // Don't persist welcome — regenerate each cold start so day count stays fresh
+    }
+  }, []);
+
   const addMsg = (msg: Omit<Msg, 'id'>) => {
-    setMessages(prev => [...prev, { ...msg, id: String(Date.now() + Math.random()) }]);
+    const newMsg: Msg = { ...msg, id: String(Date.now() + Math.random()) };
+    setMessages(prev => {
+      const next = [...prev, newMsg];
+      // Persist everything except the welcome bubble
+      persistMessages(next.filter(m => m.id !== 'welcome'));
+      return next;
+    });
     scrollToEnd();
   };
 
@@ -82,24 +143,27 @@ export function CoachScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     addMsg({ role: 'user', text });
 
-    // Safety gate — runs synchronously, no AI involved
+    // Safety gate — deterministic, no AI
     if (!isSafeToCoach(text)) {
-      const category = classifyEscalation(text);
-      // getMatchedFlags is for internal logging only — never shown to user
-      void getMatchedFlags(text);
-      addMsg({ role: 'escalation', category });
+      addMsg({ role: 'escalation', category: classifyEscalation(text) });
       return;
     }
 
-    // Build history for AI context (user + coach messages only)
+    // Build history for AI context
     const history: ChatMessage[] = messages
-      .filter(m => m.role === 'user' || m.role === 'coach')
-      .filter(m => m.text)
+      .filter(m => (m.role === 'user' || m.role === 'coach') && m.id !== 'welcome' && m.text)
       .map(m => ({ role: m.role as 'user' | 'coach', text: m.text! }));
+
+    // Profile context for personalised responses
+    const ctx: ProfileContext = {
+      dayN: dayN(),
+      isCSection: isCSection(),
+      babyName: profile?.baby_name ?? null,
+    };
 
     setIsLoading(true);
     try {
-      const reply = await askCoach(history, text);
+      const reply = await askCoach(history, text, ctx);
       addMsg({ role: 'coach', text: reply });
     } catch {
       addMsg({
@@ -134,11 +198,8 @@ export function CoachScreen() {
             contentContainerStyle={styles.msgList}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyIcon}>◆</Text>
-                <Text style={styles.emptyTitle}>Ask anything about breastfeeding</Text>
-                <Text style={styles.emptySub}>Try one of these to get started:</Text>
+            ListFooterComponent={
+              messages.length === 1 ? (
                 <View style={styles.chips}>
                   {PROMPTS.map(p => (
                     <TouchableOpacity
@@ -151,7 +212,7 @@ export function CoachScreen() {
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
+              ) : null
             }
             renderItem={({ item: msg }) => {
               if (msg.role === 'typing') return <TypingIndicator />;
@@ -245,12 +306,8 @@ const styles = StyleSheet.create({
 
   msgList: { flexGrow: 1, paddingHorizontal: spacing.md, paddingBottom: spacing.md, gap: spacing.md },
 
-  // Empty state
-  emptyState: { flex: 1, alignItems: 'center', paddingTop: spacing['2xl'], gap: spacing.md },
-  emptyIcon:  { fontSize: 40, color: palette.softFuchsia, opacity: 0.6 },
-  emptyTitle: { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes.xl, color: palette.darkText.primary, textAlign: 'center' },
-  emptySub:   { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted },
-  chips:      { width: '100%', gap: spacing.sm },
+  // Prompt chips — shown below welcome message
+  chips: { gap: spacing.sm, marginTop: spacing.sm },
   chip: {
     backgroundColor: palette.dark.surface1,
     borderRadius: radius.lg,

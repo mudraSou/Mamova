@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
 import { palette, gradients, typography, spacing, radius } from '@/theme';
 
-type Props = NativeStackScreenProps<RootStackParams, 'Login'>;
+type Props = { navigation: any };
 
 export function LoginScreen({ navigation }: Props) {
   const [email, setEmail]       = useState('');
