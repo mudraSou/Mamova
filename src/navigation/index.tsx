@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer, type NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform, Pressable } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { palette, typography } from '@/theme';
+import { palette, typography, radius } from '@/theme';
 import { useProfileStore } from '@/store/profileStore';
 
 // ── Screen imports ────────────────────────────────────────────────
@@ -58,6 +58,31 @@ const TAB_ICONS: Record<string, { outline: string; filled: string }> = {
   Coach:     { outline: '◇', filled: '◆' },
 };
 
+// ── Hoverable tab button (web) ────────────────────────────────────
+function TabBarButton({ children, onPress, onLongPress, accessibilityState }: any) {
+  const [hovered, setHovered] = useState(false);
+  const focused = accessibilityState?.selected;
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onLongPress={onLongPress}
+      style={({ pressed }) => [
+        styles.tabBtnWrap,
+        hovered && !focused && styles.tabBtnHovered,
+        focused && styles.tabBtnFocused,
+        { opacity: pressed ? 0.75 : 1 },
+      ]}
+      {...(Platform.OS === 'web' ? {
+        onPointerEnter: () => setHovered(true),
+        onPointerLeave: () => setHovered(false),
+      } : {})}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
 function SymptomsStack() {
   return (
     <SympStack.Navigator screenOptions={{ headerShown: false }}>
@@ -88,6 +113,7 @@ function MainTabs() {
             : <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(253,248,243,0.95)' }]} />
         ),
         tabBarShowLabel: false,
+        tabBarButton: (props) => <TabBarButton {...props} />,
         tabBarIcon: ({ focused }) => {
           const icons = TAB_ICONS[route.name];
           return (
@@ -165,5 +191,22 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: palette.lightBlush,
+  },
+
+  // Tab button hover
+  tabBtnWrap: {
+    flex: 1,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    borderRadius: radius.lg,
+    marginHorizontal: 4,
+    marginVertical: 6,
+    transitionDuration: Platform.OS === 'web' ? '150ms' : undefined,
+  } as any,
+  tabBtnHovered: {
+    backgroundColor: 'rgba(212,118,106,0.10)',
+  },
+  tabBtnFocused: {
+    backgroundColor: 'rgba(212,118,106,0.14)',
   },
 });
