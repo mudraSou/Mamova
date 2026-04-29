@@ -6,6 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '@/components/ui/Button';
+import { DatePicker } from '@/components/ui/DatePicker';
 import { useProfileStore } from '@/store/profileStore';
 import { palette, gradients, typography, spacing, radius } from '@/theme';
 
@@ -73,17 +74,10 @@ export function OnboardingScreen() {
               <View style={styles.stepBlock}>
                 <Text style={styles.stepTitle}>When did you deliver?</Text>
                 <Text style={styles.stepSub}>We use this to show what's normal for your stage. Day 1 = your birth day.</Text>
-                <TextInput
-                  style={[styles.input, error ? styles.inputError : null]}
-                  value={deliveryDate}
-                  onChangeText={v => { setDeliveryDate(v); setError(null); }}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor={palette.darkText.muted}
-                  autoFocus
-                  keyboardType="numbers-and-punctuation"
-                  maxLength={10}
-                  returnKeyType="next"
-                  onSubmitEditing={advance}
+                <DatePicker
+                  value={deliveryDate || null}
+                  onChange={date => { setDeliveryDate(date); setError(null); }}
+                  maxDate={new Date()}
                 />
                 {error && <Text style={styles.errorText}>{error}</Text>}
               </View>
