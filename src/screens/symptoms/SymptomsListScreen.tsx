@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useMemo, useRef } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -17,10 +17,33 @@ const CATEGORY_LABELS: Record<string, string> = {
   'baby-behaviour': 'Baby', emotional: 'Emotional',
 };
 
+// ── Animated card — spring scale on press ─────────────────────────
+function SymptomCard({ item, onPress }: { item: any; onPress: () => void }) {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const pressIn  = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
+  const pressOut = () => Animated.spring(scale, { toValue: 1,    useNativeDriver: true, speed: 25, bounciness: 6 }).start();
+
+  return (
+    <TouchableOpacity onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} activeOpacity={1}>
+      <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+        <View style={styles.cardTop}>
+          <View style={styles.cardLeft}>
+            <Text style={styles.category}>{CATEGORY_LABELS[item.category] ?? item.category}</Text>
+            <Text style={styles.cardTitle}>{item.title_user}</Text>
+            <Text style={styles.clinical}>Clinical: {item.title_clinical}</Text>
+          </View>
+          <SeverityPill severity={item.severity} />
+        </View>
+        <Text style={styles.cta}>See what helps →</Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
 export function SymptomsListScreen() {
   const nav = useNavigation<NavProp>();
   const [query, setQuery] = useState('');
-
   const results = useMemo(() => searchSymptoms(query), [query]);
 
   return (
@@ -46,9 +69,7 @@ export function SymptomsListScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>Nothing matched.</Text>
-              <Text style={styles.emptyBody}>
-                Try different words — or browse all symptoms by clearing your search.
-              </Text>
+              <Text style={styles.emptyBody}>Try different words — or browse all symptoms by clearing your search.</Text>
             </View>
           }
           ListFooterComponent={
@@ -61,23 +82,7 @@ export function SymptomsListScreen() {
             ) : null
           }
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => nav.navigate('SymptomDetail', { slug: item.slug })}
-              activeOpacity={0.8}
-            >
-              <View style={styles.cardTop}>
-                <View style={styles.cardLeft}>
-                  <Text style={styles.category}>
-                    {CATEGORY_LABELS[item.category] ?? item.category}
-                  </Text>
-                  <Text style={styles.cardTitle}>{item.title_user}</Text>
-                  <Text style={styles.clinical}>Clinical: {item.title_clinical}</Text>
-                </View>
-                <SeverityPill severity={item.severity} />
-              </View>
-              <Text style={styles.cta}>See what helps →</Text>
-            </TouchableOpacity>
+            <SymptomCard item={item} onPress={() => nav.navigate('SymptomDetail', { slug: item.slug })} />
           )}
         />
       </SafeAreaView>
@@ -86,19 +91,12 @@ export function SymptomsListScreen() {
 }
 
 const styles = StyleSheet.create({
-  list: { paddingHorizontal: spacing.md, paddingBottom: 100, gap: spacing.md },
-
-  header: { paddingTop: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },
+  list:     { paddingHorizontal: spacing.md, paddingBottom: 100, gap: spacing.md },
+  header:   { paddingTop: spacing.lg, paddingBottom: spacing.sm, gap: spacing.sm },
   title:    { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes['3xl'], color: palette.darkText.primary, lineHeight: typography.sizes['3xl'] * 1.2 },
   subtitle: { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.secondary, lineHeight: typography.sizes.md * 1.6 },
 
-  card: {
-    backgroundColor: palette.dark.surface1,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.sm,
-    ...shadows.sm,
-  },
+  card:      { backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.md, gap: spacing.sm, ...shadows.sm },
   cardTop:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.sm },
   cardLeft:  { flex: 1, gap: 3 },
   category:  { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.8 },
@@ -106,10 +104,10 @@ const styles = StyleSheet.create({
   clinical:  { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted, fontStyle: 'italic' },
   cta:       { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.sm, color: palette.softFuchsia },
 
-  empty: { paddingTop: spacing.xl, alignItems: 'center', gap: spacing.sm },
+  empty:      { paddingTop: spacing.xl, alignItems: 'center', gap: spacing.sm },
   emptyTitle: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.secondary },
   emptyBody:  { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted, textAlign: 'center', maxWidth: 260, lineHeight: typography.sizes.sm * 1.6 },
 
-  footer: { paddingVertical: spacing.xl, alignItems: 'center' },
+  footer:     { paddingVertical: spacing.xl, alignItems: 'center' },
   footerText: { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes.md, color: palette.darkText.muted, textAlign: 'center', fontStyle: 'italic', maxWidth: 260 },
 });

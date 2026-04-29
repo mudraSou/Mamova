@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -103,17 +103,16 @@ export function HomeScreen() {
               { label: 'How to\nfeed',   icon: '✦', tab: 'Positions', color: palette.softFuchsia   },
               { label: 'Ask\nMamova',    icon: '◇', tab: 'Coach',     color: palette.softRose      },
             ] as const).map(({ label, icon: ic, tab, color }) => (
-              <TouchableOpacity
+              <Pressable
                 key={tab}
-                style={styles.quickBtn}
+                style={({ pressed }) => [styles.quickBtn, { transform: [{ scale: pressed ? 0.94 : 1 }] }]}
                 onPress={() => nav.navigate(tab as keyof MainTabParams)}
-                activeOpacity={0.75}
               >
                 <View style={[styles.quickIconWrap, { backgroundColor: color + '1a' }]}>
                   <Text style={[styles.quickIcon, { color }]}>{ic}</Text>
                 </View>
                 <Text style={styles.quickLabel}>{label}</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </View>
 
