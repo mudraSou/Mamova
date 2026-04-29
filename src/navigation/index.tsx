@@ -83,17 +83,18 @@ function MainTabs() {
             ? <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
             : <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(253,248,243,0.95)' }]} />
         ),
-        tabBarLabel: ({ focused }) => (
-          <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
-            {route.name}
-          </Text>
-        ),
+        tabBarShowLabel: false,
         tabBarIcon: ({ focused }) => {
           const icons = TAB_ICONS[route.name];
           return (
-            <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
-              {focused ? icons?.filled : icons?.outline}
-            </Text>
+            <View style={styles.tabItem}>
+              <Text style={[styles.tabIcon, focused && styles.tabIconActive]}>
+                {focused ? icons?.filled : icons?.outline}
+              </Text>
+              <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>
+                {route.name}
+              </Text>
+            </View>
           );
         },
         tabBarActiveTintColor:   palette.lightBlush,
@@ -138,10 +139,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     elevation: 0,
   },
+  tabItem: {
+    alignItems: 'center' as const,
+    gap: 3,
+  },
   tabIcon: {
     fontSize: 18,
     color: palette.darkText.muted,
-    marginBottom: 2,
   },
   tabIconActive: {
     color: palette.lightBlush,
