@@ -2,7 +2,7 @@
  * Mamova Design System — Color Tokens
  * "You birthed life. Now reclaim yours."
  *
- * Palette family: Warm ivory → Dusty coral → Sage teal → Mint frost
+ * Palette family: Warm ivory → Dusty coral → Rose petal → Sage teal
  * Philosophy: Light and airy. Warm like morning light; cool like a deep breath.
  * Not clinical. Not cold. Honest and gentle.
  */
@@ -17,6 +17,11 @@ export const palette = {
   softFuchsia:     '#5e9e94',   // dusty sage-teal — secondary accent
   lightBlush:      '#f0a080',   // warm peach — highlights, active states
   blushDim:        '#e0906a',   // peach pressed
+
+  // ── Rose — emotional accent ──────────────────────────────────
+  softRose:        '#c97a88',   // muted rose — affirmations, emotional moments
+  roseLight:       '#fae8ec',   // pale rose wash — affirmation backgrounds
+  roseMid:         '#e8a8b2',   // mid rose — decorative orbs
 
   // ── Surface layers (warm light theme) ───────────────────────
   dark: {
@@ -85,4 +90,13 @@ export const gradients = {
 
   // Splash / onboarding — warm cream → dusty rose → cool sage mist
   splash: ['#fdf2e9', '#f0c8b8', '#bcd8d4'] as const,
+
+  // Dawn — home header background
+  dawn: ['#fef0e6', '#fce8d8', '#f8ddd0'] as const,
+
+  // Affirmation card — rose petal warmth
+  affirmation: ['#fdf0f2', '#fef6f4'] as const,
+
+  // Rose — emotional highlight panels
+  rose: ['#fae8ec', '#f5dde2'] as const,
 } as const;

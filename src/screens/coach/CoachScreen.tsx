@@ -26,7 +26,7 @@ const PROMPTS = [
   "I feel like I'm failing at this. Is that normal?",
 ];
 
-// ── Persistence (web only — SecureStore byte limit too small for chat) ──
+// ── Persistence (web only) ────────────────────────────────────────
 const COACH_MESSAGES_KEY = 'mamova_coach_messages';
 
 function loadPersistedMessages(): Msg[] {
@@ -34,36 +34,33 @@ function loadPersistedMessages(): Msg[] {
   try {
     const raw = localStorage.getItem(COACH_MESSAGES_KEY);
     return raw ? (JSON.parse(raw) as Msg[]) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function persistMessages(msgs: Msg[]): void {
   if (Platform.OS !== 'web') return;
   try {
     localStorage.setItem(COACH_MESSAGES_KEY, JSON.stringify(msgs.slice(-50)));
-  } catch { /* storage full — silently skip */ }
+  } catch { /* storage full */ }
 }
 
-// ── Welcome message (template, no AI call) ────────────────────────
-function buildWelcome(
-  babyName: string | null,
-  day: number,
-  csection: boolean,
-): string {
-  const nameStr = babyName ? ` and ${babyName}` : '';
+// ── Welcome message ───────────────────────────────────────────────
+function buildWelcome(motherName: string | null, babyName: string | null, day: number, csection: boolean): string {
+  const name  = motherName ? motherName.split(' ')[0] : null;
+  const baby  = babyName   ? babyName.split(' ')[0]   : null;
+  const bstr  = baby ? ` and ${baby}` : '';
+  const intro = name ? `Hi, ${name}${bstr}.` : `Hi${bstr}.`;
 
   if (day <= 3) {
-    return `Hi${nameStr}. Day ${day} — the very beginning. These first days are tender and hard in ways nobody fully prepares you for.\n\nI'm here for any question about feeding, your body, or how you're feeling. Nothing is too small.`;
+    return `${intro} Day ${day} — the very beginning.\n\nThese first days are tender and hard in ways nobody fully prepares you for. I'm here for any question about feeding, your body, or how you're feeling. Nothing is too small.`;
   }
   if (day <= 7) {
-    return `Hi${nameStr}. Day ${day} — your milk is coming in${csection ? ' while you recover from surgery' : ''}. There's a lot happening in your body right now.\n\nAsk me anything. I'm here at any hour.`;
+    return `${intro} Day ${day} — your milk is coming in${csection ? ' while you recover from surgery' : ''}.\n\nThere's a lot happening in your body right now. Ask me anything. I'm here at any hour.`;
   }
   if (day <= 14) {
-    return `Hi${nameStr}. Day ${day} — you're finding your rhythm.\n\nI'm here for breastfeeding questions, recovery, or just to talk through how things are going.`;
+    return `${intro} Day ${day} — you're finding your rhythm.\n\nI'm here for breastfeeding questions, recovery, or just to talk through how things are going.`;
   }
-  return `Hi${nameStr}. I'm Mamova — your breastfeeding and postpartum coach.\n\nAsk me anything about feeding, recovery, or how you're feeling.`;
+  return `${intro} I'm Mamova — your breastfeeding and postpartum coach.\n\nAsk me anything about feeding, recovery, or how you're feeling. I'm here at any hour.`;
 }
 
 // ── Typing indicator ──────────────────────────────────────────────
@@ -105,22 +102,20 @@ function TypingIndicator() {
 export function CoachScreen() {
   const { profile, dayN, isCSection } = useProfileStore();
 
-  const [messages, setMessages] = useState<Msg[]>(() => loadPersistedMessages());
-  const [input, setInput]       = useState('');
+  const [messages, setMessages]   = useState<Msg[]>(() => loadPersistedMessages());
+  const [input, setInput]         = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const listRef = useRef<FlatList>(null);
 
   const scrollToEnd = () =>
     setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
 
-  // ── Personalized welcome on first open ──────────────────────────
   useEffect(() => {
     if (messages.length === 0) {
       const day   = profile?.delivery_date ? calcDayN(profile.delivery_date) : 1;
       const csect = profile?.delivery_type === 'c-section';
-      const text  = buildWelcome(profile?.baby_name ?? null, day, csect);
+      const text  = buildWelcome(profile?.mother_name ?? null, profile?.baby_name ?? null, day, csect);
       setMessages([{ id: 'welcome', role: 'coach', text }]);
-      // Don't persist welcome — regenerate each cold start so day count stays fresh
     }
   }, []);
 
@@ -128,7 +123,6 @@ export function CoachScreen() {
     const newMsg: Msg = { ...msg, id: String(Date.now() + Math.random()) };
     setMessages(prev => {
       const next = [...prev, newMsg];
-      // Persist everything except the welcome bubble
       persistMessages(next.filter(m => m.id !== 'welcome'));
       return next;
     });
@@ -143,18 +137,15 @@ export function CoachScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     addMsg({ role: 'user', text });
 
-    // Safety gate — deterministic, no AI
     if (!isSafeToCoach(text)) {
       addMsg({ role: 'escalation', category: classifyEscalation(text) });
       return;
     }
 
-    // Build history for AI context
     const history: ChatMessage[] = messages
       .filter(m => (m.role === 'user' || m.role === 'coach') && m.id !== 'welcome' && m.text)
       .map(m => ({ role: m.role as 'user' | 'coach', text: m.text! }));
 
-    // Profile context for personalised responses
     const ctx: ProfileContext = {
       dayN: dayN(),
       isCSection: isCSection(),
@@ -184,13 +175,20 @@ export function CoachScreen() {
       <SafeAreaView style={{ flex: 1 }} edges={['top']}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
 
-          {/* Header */}
+          {/* ── Header ─────────────────────────────────────────── */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Ask me anything</Text>
-            <Text style={styles.headerSub}>Breastfeeding · Recovery · Wellbeing</Text>
+            <View style={styles.headerLeft}>
+              <View style={styles.headerOrb}>
+                <Text style={styles.headerOrbText}>✦</Text>
+              </View>
+              <View>
+                <Text style={styles.headerTitle}>I'm here.</Text>
+                <Text style={styles.headerSub}>Ask anything — no question is too small.</Text>
+              </View>
+            </View>
           </View>
 
-          {/* Messages */}
+          {/* ── Messages ───────────────────────────────────────── */}
           <FlatList
             ref={listRef}
             data={displayList}
@@ -201,6 +199,7 @@ export function CoachScreen() {
             ListFooterComponent={
               messages.length === 1 ? (
                 <View style={styles.chips}>
+                  <Text style={styles.chipsLabel}>Some mothers start with</Text>
                   {PROMPTS.map(p => (
                     <TouchableOpacity
                       key={p}
@@ -208,6 +207,7 @@ export function CoachScreen() {
                       onPress={() => setInput(p)}
                       activeOpacity={0.75}
                     >
+                      <Text style={styles.chipGlyph}>◇</Text>
                       <Text style={styles.chipText}>{p}</Text>
                     </TouchableOpacity>
                   ))}
@@ -223,7 +223,7 @@ export function CoachScreen() {
                     <LinearGradient
                       colors={gradients.button}
                       start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
+                      end={{ x: 1, y: 1 }}
                       style={styles.userBubble}
                     >
                       <Text style={styles.userText}>{(msg as Msg).text}</Text>
@@ -234,9 +234,14 @@ export function CoachScreen() {
 
               if (msg.role === 'coach') {
                 return (
-                  <View style={styles.coachBubble}>
-                    <Text style={styles.coachLabel}>Mamova ✦</Text>
-                    <Text style={styles.coachText}>{(msg as Msg).text}</Text>
+                  <View style={styles.coachBubbleRow}>
+                    <View style={styles.coachBubble}>
+                      <View style={styles.coachAccentBar} />
+                      <View style={styles.coachBubbleContent}>
+                        <Text style={styles.coachLabel}>Mamova ✦</Text>
+                        <Text style={styles.coachText}>{(msg as Msg).text}</Text>
+                      </View>
+                    </View>
                   </View>
                 );
               }
@@ -264,14 +269,14 @@ export function CoachScreen() {
             }}
           />
 
-          {/* Input bar */}
+          {/* ── Input bar ──────────────────────────────────────── */}
           <View style={styles.inputBar}>
             <View style={styles.inputRow}>
               <TextInput
                 style={styles.input}
                 value={input}
                 onChangeText={setInput}
-                placeholder="Describe what you're experiencing…"
+                placeholder="What's on your mind?"
                 placeholderTextColor={palette.darkText.muted}
                 multiline
                 maxLength={500}
@@ -291,6 +296,7 @@ export function CoachScreen() {
                 </LinearGradient>
               </TouchableOpacity>
             </View>
+            <Text style={styles.inputNote}>Breastfeeding · Recovery · Wellbeing</Text>
           </View>
 
         </KeyboardAvoidingView>
@@ -300,50 +306,72 @@ export function CoachScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.sm, gap: 2 },
-  headerTitle: { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes.xl, color: palette.darkText.primary },
-  headerSub:   { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted },
+  // Header
+  header: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.dark.surface2,
+  },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  headerOrb: {
+    width: 42,
+    height: 42,
+    borderRadius: radius.lg,
+    backgroundColor: palette.roseLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerOrbText: { fontSize: 18, color: palette.softRose },
+  headerTitle:   { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes.xl, color: palette.darkText.primary },
+  headerSub:     { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted, marginTop: 1 },
 
-  msgList: { flexGrow: 1, paddingHorizontal: spacing.md, paddingBottom: spacing.md, gap: spacing.md },
+  msgList: { flexGrow: 1, paddingHorizontal: spacing.md, paddingBottom: spacing.md, paddingTop: spacing.md, gap: spacing.md },
 
-  // Prompt chips — shown below welcome message
-  chips: { gap: spacing.sm, marginTop: spacing.sm },
+  // Prompt chips
+  chips:      { gap: spacing.sm, marginTop: spacing.sm },
+  chipsLabel: { fontFamily: typography.fonts.body, fontSize: typography.sizes.xs, color: palette.darkText.muted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
     backgroundColor: palette.dark.surface1,
     borderRadius: radius.lg,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: palette.dark.surface2,
   },
-  chipText: { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.5 },
+  chipGlyph: { fontSize: 12, color: palette.softRose, marginTop: 2 },
+  chipText:  { flex: 1, fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.5 },
 
   // User bubble
   userBubbleRow: { alignItems: 'flex-end' },
-  userBubble:    { maxWidth: '80%', borderRadius: radius.lg, padding: spacing.md, borderBottomRightRadius: 4 },
+  userBubble:    { maxWidth: '80%', borderRadius: radius.xl, borderBottomRightRadius: 6, padding: spacing.md },
   userText:      { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.white, lineHeight: typography.sizes.md * 1.5 },
 
   // Coach bubble
+  coachBubbleRow: { alignItems: 'flex-start' },
   coachBubble: {
-    maxWidth: '85%',
+    maxWidth: '88%',
+    flexDirection: 'row',
     backgroundColor: palette.dark.surface1,
-    borderRadius: radius.lg, borderBottomLeftRadius: 4,
-    padding: spacing.md, gap: spacing.xs,
+    borderRadius: radius.xl,
+    borderBottomLeftRadius: 6,
+    overflow: 'hidden',
     ...shadows.sm,
   },
-  coachLabel: { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.8 },
-  coachText:  { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.primary, lineHeight: typography.sizes.md * 1.6 },
+  coachAccentBar:     { width: 3, backgroundColor: palette.softRose, flexShrink: 0 },
+  coachBubbleContent: { flex: 1, padding: spacing.md, gap: spacing.xs },
+  coachLabel:  { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softRose, textTransform: 'uppercase', letterSpacing: 0.8 },
+  coachText:   { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.primary, lineHeight: typography.sizes.md * 1.65 },
 
   // Typing dots
-  dots: { flexDirection: 'row', gap: 5, paddingVertical: 4 },
-  dot:  { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.softFuchsia },
+  dots: { flexDirection: 'row', gap: 5, paddingVertical: 4, paddingLeft: spacing.md },
+  dot:  { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.softRose },
 
   // Escalation
-  escalation: {
-    backgroundColor: palette.urgentBg,
-    borderRadius: radius.lg,
-    padding: spacing.md, gap: spacing.md,
-    borderWidth: 1, borderColor: `${palette.urgent}33`,
-  },
+  escalation: { backgroundColor: palette.urgentBg, borderRadius: radius.lg, padding: spacing.md, gap: spacing.md, borderWidth: 1, borderColor: `${palette.urgent}33` },
   escalationTitle:        { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.md, color: palette.urgent },
   escalationBody:         { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.6 },
   escalationAction:       { backgroundColor: palette.dark.surface1, borderRadius: radius.md, padding: spacing.sm, gap: 2 },
@@ -353,8 +381,24 @@ const styles = StyleSheet.create({
   escalationDisclaimer:   { fontFamily: typography.fonts.body, fontSize: typography.sizes.xs, color: palette.darkText.muted, fontStyle: 'italic', lineHeight: typography.sizes.xs * 1.6 },
 
   // Input bar
-  inputBar: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderTopWidth: 1, borderTopColor: palette.dark.surface2 },
-  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm, backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.sm },
+  inputBar: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: palette.dark.surface2,
+    gap: 6,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+    backgroundColor: palette.dark.surface1,
+    borderRadius: radius.xl,
+    padding: spacing.sm,
+    borderWidth: 1,
+    borderColor: palette.dark.surface3,
+  },
   input: {
     flex: 1,
     fontFamily: typography.fonts.body,
@@ -368,4 +412,5 @@ const styles = StyleSheet.create({
   sendBtnDisabled: { opacity: 0.35 },
   sendGrad:        { flex: 1, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center' },
   sendIcon:        { fontSize: 18, color: palette.white, fontWeight: '700' },
+  inputNote:       { fontFamily: typography.fonts.body, fontSize: 10, color: palette.darkText.muted, textAlign: 'center', letterSpacing: 0.4 },
 });

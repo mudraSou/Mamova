@@ -14,48 +14,78 @@ const { height } = Dimensions.get('window');
 
 export function WelcomeScreen({ navigation }: Props) {
   const fadeAnim  = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(40)).current;
+  const slideAnim = useRef(new Animated.Value(32)).current;
+  const orb1Scale = useRef(new Animated.Value(0.85)).current;
+  const orb2Scale = useRef(new Animated.Value(0.9)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim,  { toValue: 1, duration: 900, delay: 200, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 700, delay: 200, useNativeDriver: true }),
+      Animated.timing(fadeAnim,  { toValue: 1, duration: 1000, delay: 100, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 800,  delay: 200, useNativeDriver: true }),
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(orb1Scale, { toValue: 1.1, duration: 4000, useNativeDriver: true }),
+          Animated.timing(orb1Scale, { toValue: 0.85, duration: 4000, useNativeDriver: true }),
+        ]),
+      ),
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(orb2Scale, { toValue: 0.75, duration: 3500, useNativeDriver: true }),
+          Animated.timing(orb2Scale, { toValue: 1.05, duration: 3500, useNativeDriver: true }),
+        ]),
+      ),
     ]).start();
   }, []);
 
   return (
     <LinearGradient colors={gradients.splash} locations={[0, 0.5, 1]} style={styles.root}>
-      {/* Ambient orb */}
-      <View style={styles.orb} pointerEvents="none" />
+
+      {/* Floating ambient orbs — decorative, do not interact */}
+      <Animated.View pointerEvents="none" style={[styles.orb, styles.orbTop, { transform: [{ scale: orb1Scale }] }]} />
+      <Animated.View pointerEvents="none" style={[styles.orb, styles.orbMid, { transform: [{ scale: orb2Scale }] }]} />
+      <View pointerEvents="none" style={[styles.orb, styles.orbBottom]} />
 
       <SafeAreaView style={styles.safe}>
         <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
 
           {/* Brand mark */}
           <View style={styles.brandRow}>
-            <View style={styles.logoMark}>
+            <LinearGradient colors={gradients.button} style={styles.logoMark}>
               <Text style={styles.logoText}>M</Text>
-            </View>
+            </LinearGradient>
             <Text style={styles.appName}>Mamova</Text>
           </View>
 
           {/* Hero copy */}
           <View style={styles.heroBlock}>
-            <Text style={styles.tagline}>You birthed life.</Text>
-            <Text style={[styles.tagline, styles.taglineAccent]}>Now reclaim yours.</Text>
+            <Text style={styles.tagline}>You birthed</Text>
+            <Text style={styles.tagline}>life.</Text>
+            <Text style={[styles.tagline, styles.taglineAccent]}>Now reclaim</Text>
+            <Text style={[styles.tagline, styles.taglineAccent]}>yours.</Text>
+          </View>
+
+          {/* Divider thread */}
+          <View style={styles.thread}>
+            <View style={styles.threadDot} />
+            <View style={styles.threadLine} />
+            <View style={styles.threadDot} />
           </View>
 
           {/* Sub-copy */}
           <Text style={styles.body}>
-            Your guide through the 4th trimester — breastfeeding, recovery, and everything in between.
+            A gentle guide through the 4th trimester. Breastfeeding, recovery, and the questions you're afraid to ask at 3am.
           </Text>
 
           {/* Pillars */}
           <View style={styles.pillars}>
-            {['Breastfeeding guidance', 'Symptom support', 'AI wellness coach'].map(p => (
-              <View key={p} style={styles.pillarRow}>
-                <View style={styles.pillarDot} />
-                <Text style={styles.pillarText}>{p}</Text>
+            {[
+              { icon: '◎', label: 'Symptom support' },
+              { icon: '✦', label: 'Feeding positions' },
+              { icon: '◇', label: 'AI wellness coach' },
+            ].map(p => (
+              <View key={p.label} style={styles.pillarRow}>
+                <Text style={styles.pillarIcon}>{p.icon}</Text>
+                <Text style={styles.pillarText}>{p.label}</Text>
               </View>
             ))}
           </View>
@@ -65,12 +95,11 @@ export function WelcomeScreen({ navigation }: Props) {
         {/* CTAs — pinned to bottom */}
         <Animated.View style={[styles.ctas, { opacity: fadeAnim }]}>
           <Button
-            label="Get started"
+            label="Begin your journey"
             onPress={() => navigation.navigate('Onboarding')}
             size="lg"
           />
 
-          {/* Partner join */}
           <TouchableOpacity
             style={styles.joinBtn}
             onPress={() => navigation.navigate('Join')}
@@ -81,7 +110,7 @@ export function WelcomeScreen({ navigation }: Props) {
           </TouchableOpacity>
 
           <Text style={styles.disclaimer}>
-            Private. Your data lives on your device and in a secure cloud — only you and your partner can access it.
+            Private by design. Your story stays yours.
           </Text>
         </Animated.View>
       </SafeAreaView>
@@ -93,31 +122,50 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   safe: { flex: 1, paddingHorizontal: spacing.lg },
 
+  // ── Floating orbs ─────────────────────────────────────────────
   orb: {
     position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 160,
+    borderRadius: 9999,
+    pointerEvents: 'none',
+  },
+  orbTop: {
+    width: 340,
+    height: 340,
     backgroundColor: palette.electricPurple,
-    opacity: 0.15,
-    top: height * 0.1,
+    opacity: 0.11,
+    top: -60,
     right: -80,
-    transform: [{ scale: 1.5 }],
+  },
+  orbMid: {
+    width: 220,
+    height: 220,
+    backgroundColor: palette.roseMid,
+    opacity: 0.18,
+    top: height * 0.28,
+    left: -60,
+  },
+  orbBottom: {
+    width: 280,
+    height: 280,
+    backgroundColor: palette.softFuchsia,
+    opacity: 0.09,
+    bottom: height * 0.18,
+    right: -60,
   },
 
   content: { flex: 1, justifyContent: 'center', paddingTop: spacing['2xl'] },
 
+  // ── Brand ─────────────────────────────────────────────────────
   brandRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing.xl,
   },
   logoMark: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: palette.electricPurple,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -133,40 +181,59 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
 
-  heroBlock: { marginBottom: spacing.lg },
+  // ── Hero ──────────────────────────────────────────────────────
+  heroBlock: { marginBottom: spacing.lg, gap: 0 },
   tagline: {
     fontFamily: typography.fonts.headlineBold,
     fontSize: typography.sizes['4xl'],
     color: palette.darkText.primary,
-    lineHeight: typography.sizes['4xl'] * 1.2,
+    lineHeight: typography.sizes['4xl'] * 1.15,
   },
   taglineAccent: {
-    color: palette.softFuchsia,
+    color: palette.electricPurple,
   },
 
+  // ── Thread divider ────────────────────────────────────────────
+  thread: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: spacing.lg,
+  },
+  threadDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: palette.roseMid,
+  },
+  threadLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: palette.roseMid,
+    opacity: 0.6,
+  },
+
+  // ── Body ──────────────────────────────────────────────────────
   body: {
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.md,
     color: palette.darkText.secondary,
-    lineHeight: typography.sizes.md * 1.7,
-    marginBottom: spacing.xl,
+    lineHeight: typography.sizes.md * 1.75,
+    marginBottom: spacing.lg,
     maxWidth: 320,
   },
 
+  // ── Pillars ───────────────────────────────────────────────────
   pillars: { gap: spacing.sm },
   pillarRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  pillarDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: palette.softFuchsia,
-  },
+  pillarIcon: { fontSize: 15, color: palette.softFuchsia, width: 22, textAlign: 'center' },
   pillarText: {
     fontFamily: typography.fonts.bodyMedium,
     fontSize: typography.sizes.sm,
     color: palette.darkText.secondary,
   },
 
+  // ── CTAs ──────────────────────────────────────────────────────
   ctas: {
     paddingBottom: spacing.xl,
     gap: spacing.md,
