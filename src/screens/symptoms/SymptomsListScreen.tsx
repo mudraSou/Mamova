@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -17,16 +17,27 @@ const CATEGORY_LABELS: Record<string, string> = {
   'baby-behaviour': 'Baby', emotional: 'Emotional',
 };
 
-// ── Animated card — spring scale on press ─────────────────────────
+// ── Animated card: spring press + hover highlight ─────────────────
 function SymptomCard({ item, onPress }: { item: any; onPress: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
+  const [hovered, setHovered] = useState(false);
 
   const pressIn  = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
   const pressOut = () => Animated.spring(scale, { toValue: 1,    useNativeDriver: true, speed: 25, bounciness: 6 }).start();
 
   return (
-    <TouchableOpacity onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} activeOpacity={1}>
-      <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+    <TouchableOpacity
+      onPress={onPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      activeOpacity={1}
+      style={Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : undefined}
+    >
+      <Animated.View
+        style={[styles.card, hovered && styles.cardHovered, { transform: [{ scale }] }]}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+      >
         <View style={styles.cardTop}>
           <View style={styles.cardLeft}>
             <Text style={styles.category}>{CATEGORY_LABELS[item.category] ?? item.category}</Text>
@@ -35,7 +46,10 @@ function SymptomCard({ item, onPress }: { item: any; onPress: () => void }) {
           </View>
           <SeverityPill severity={item.severity} />
         </View>
-        <Text style={styles.cta}>See what helps →</Text>
+        <View style={styles.ctaRow}>
+          <Text style={[styles.cta, hovered && styles.ctaHovered]}>See what helps</Text>
+          <Text style={[styles.ctaArrow, hovered && styles.ctaArrowHovered]}>→</Text>
+        </View>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -96,13 +110,19 @@ const styles = StyleSheet.create({
   title:    { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes['3xl'], color: palette.darkText.primary, lineHeight: typography.sizes['3xl'] * 1.2 },
   subtitle: { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.secondary, lineHeight: typography.sizes.md * 1.6 },
 
-  card:      { backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.md, gap: spacing.sm, ...shadows.sm },
-  cardTop:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.sm },
-  cardLeft:  { flex: 1, gap: 3 },
-  category:  { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.8 },
-  cardTitle: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.primary, lineHeight: typography.sizes.md * 1.35 },
-  clinical:  { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted, fontStyle: 'italic' },
-  cta:       { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.sm, color: palette.softFuchsia },
+  card:        { backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.md, gap: spacing.sm, ...shadows.sm, borderWidth: 1, borderColor: 'transparent' },
+  cardHovered: { backgroundColor: palette.dark.surface2, borderColor: palette.dark.surface3 },
+  cardTop:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing.sm },
+  cardLeft:    { flex: 1, gap: 3 },
+  category:    { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.8 },
+  cardTitle:   { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.primary, lineHeight: typography.sizes.md * 1.35 },
+  clinical:    { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.muted, fontStyle: 'italic' },
+
+  ctaRow:       { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  cta:          { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.sm, color: palette.softFuchsia },
+  ctaHovered:   { color: palette.electricPurple },
+  ctaArrow:     { fontSize: typography.sizes.sm, color: palette.softFuchsia },
+  ctaArrowHovered: { color: palette.electricPurple },
 
   empty:      { paddingTop: spacing.xl, alignItems: 'center', gap: spacing.sm },
   emptyTitle: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.secondary },

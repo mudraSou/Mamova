@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, FlatList,
+  View, Text, TextInput, TouchableOpacity, Pressable, FlatList,
   StyleSheet, KeyboardAvoidingView, Platform, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -201,15 +201,18 @@ export function CoachScreen() {
                 <View style={styles.chips}>
                   <Text style={styles.chipsLabel}>Some mothers start with</Text>
                   {PROMPTS.map(p => (
-                    <TouchableOpacity
+                    <Pressable
                       key={p}
-                      style={styles.chip}
+                      style={({ pressed, hovered: h }: any) => [
+                        styles.chip,
+                        (h as boolean) && Platform.OS === 'web' && styles.chipHovered,
+                        pressed && { opacity: 0.75 },
+                      ]}
                       onPress={() => setInput(p)}
-                      activeOpacity={0.75}
                     >
                       <Text style={styles.chipGlyph}>◇</Text>
                       <Text style={styles.chipText}>{p}</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   ))}
                 </View>
               ) : null
@@ -342,6 +345,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: palette.dark.surface2,
   },
+  chipHovered: { backgroundColor: palette.dark.surface2, borderColor: palette.dark.surface3 },
   chipGlyph: { fontSize: 12, color: palette.softRose, marginTop: 2 },
   chipText:  { flex: 1, fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.5 },
 

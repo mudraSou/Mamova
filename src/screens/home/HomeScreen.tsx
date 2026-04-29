@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Pressable, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -105,7 +105,11 @@ export function HomeScreen() {
             ] as const).map(({ label, icon: ic, tab, color }) => (
               <Pressable
                 key={tab}
-                style={({ pressed }) => [styles.quickBtn, { transform: [{ scale: pressed ? 0.94 : 1 }] }]}
+                style={({ pressed, hovered: h }: any) => [
+                  styles.quickBtn,
+                  (h as boolean) && Platform.OS === 'web' && styles.quickBtnHovered,
+                  { transform: [{ scale: pressed ? 0.94 : 1 }] },
+                ]}
                 onPress={() => nav.navigate(tab as keyof MainTabParams)}
               >
                 <View style={[styles.quickIconWrap, { backgroundColor: color + '1a' }]}>
@@ -124,16 +128,19 @@ export function HomeScreen() {
                 <Text style={styles.sectionTitle}>Common around Day {day}</Text>
               </View>
               {todayCards.map((card: any) => (
-                <TouchableOpacity
+                <Pressable
                   key={card.slug}
-                  style={styles.symptomCard}
-                  activeOpacity={0.8}
+                  style={({ pressed, hovered: h }: any) => [
+                    styles.symptomCard,
+                    (h as boolean) && Platform.OS === 'web' && styles.cardHovered,
+                    { transform: [{ scale: pressed ? 0.97 : 1 }] },
+                  ]}
                   onPress={() => nav.navigate('Symptoms', { screen: 'SymptomDetail', params: { slug: card.slug } })}
                 >
                   <SeverityPill severity={card.severity} />
                   <Text style={styles.symptomTitle}>{card.title_user}</Text>
                   <Text style={styles.symptomCta}>See what helps →</Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
           )}
@@ -147,9 +154,12 @@ export function HomeScreen() {
                   {csect ? 'Gentle for C-section recovery' : 'A good place to start'}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={styles.positionCard}
-                activeOpacity={0.8}
+              <Pressable
+                style={({ pressed, hovered: h }: any) => [
+                  styles.positionCard,
+                  (h as boolean) && Platform.OS === 'web' && styles.cardHovered,
+                  { transform: [{ scale: pressed ? 0.97 : 1 }] },
+                ]}
                 onPress={() => nav.navigate('Positions', { screen: 'PositionDetail', params: { slug: featured.slug } })}
               >
                 <View style={styles.positionIconWrap}>
@@ -160,7 +170,7 @@ export function HomeScreen() {
                   <Text style={styles.positionTagline}>{featured.tagline}</Text>
                 </View>
                 <Text style={styles.chevron}>›</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           )}
 
@@ -214,8 +224,12 @@ const styles = StyleSheet.create({
   heroThreadLine:  { flex: 1, height: 1, backgroundColor: palette.electricPurple, opacity: 0.18 },
   heroThreadGlyph: { fontSize: 12, color: palette.electricPurple, opacity: 0.4 },
 
+  // Hover shared
+  cardHovered:    { backgroundColor: palette.dark.surface2, borderColor: palette.dark.surface3 },
+
   // Quick access
   quickRow: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.md },
+  quickBtnHovered: { backgroundColor: palette.dark.surface2 },
   quickBtn: {
     flex: 1, paddingVertical: spacing.md, paddingHorizontal: spacing.sm,
     backgroundColor: palette.dark.surface1,

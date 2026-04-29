@@ -27,3 +27,4 @@ symptoms-loading.*
 
 expo-env.d.ts
 # @end expo-cli
+.vercel

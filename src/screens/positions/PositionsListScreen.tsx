@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -15,32 +15,45 @@ const DIFFICULTY: Record<string, string> = {
   beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced',
 };
 
-// ── Animated card — spring scale on press ─────────────────────────
+// ── Animated card: spring press + hover highlight ─────────────────
 function PositionCard({ item, onPress }: { item: any; onPress: () => void }) {
   const scale = useRef(new Animated.Value(1)).current;
+  const [hovered, setHovered] = useState(false);
 
   const pressIn  = () => Animated.spring(scale, { toValue: 0.97, useNativeDriver: true, speed: 60, bounciness: 0 }).start();
   const pressOut = () => Animated.spring(scale, { toValue: 1,    useNativeDriver: true, speed: 25, bounciness: 6 }).start();
 
   return (
-    <TouchableOpacity onPress={onPress} onPressIn={pressIn} onPressOut={pressOut} activeOpacity={1}>
-      <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
-        <LinearGradient colors={gradients.button} style={styles.iconBox}>
+    <TouchableOpacity
+      onPress={onPress}
+      onPressIn={pressIn}
+      onPressOut={pressOut}
+      activeOpacity={1}
+      style={Platform.OS === 'web' ? ({ cursor: 'pointer' } as any) : undefined}
+    >
+      <Animated.View
+        style={[styles.card, hovered && styles.cardHovered, { transform: [{ scale }] }]}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+      >
+        <LinearGradient colors={hovered ? [palette.electricPurple, palette.lightBlush] : gradients.button} style={styles.iconBox}>
           <Text style={styles.icon}>✦</Text>
         </LinearGradient>
         <View style={styles.cardText}>
-          <Text style={styles.difficulty}>{DIFFICULTY[item.difficulty] ?? item.difficulty}</Text>
+          <Text style={[styles.difficulty, hovered && styles.difficultyHovered]}>
+            {DIFFICULTY[item.difficulty] ?? item.difficulty}
+          </Text>
           <Text style={styles.cardTitle}>{item.title}</Text>
           <Text style={styles.tagline}>{item.tagline}</Text>
           <View style={styles.tags}>
             {(item.best_for ?? []).slice(0, 2).map((t: string) => (
-              <View key={t} style={styles.tag}>
+              <View key={t} style={[styles.tag, hovered && styles.tagHovered]}>
                 <Text style={styles.tagText}>{t}</Text>
               </View>
             ))}
           </View>
         </View>
-        <Text style={styles.chevron}>›</Text>
+        <Text style={[styles.chevron, hovered && styles.chevronHovered]}>›</Text>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -92,17 +105,21 @@ const styles = StyleSheet.create({
   title:    { fontFamily: typography.fonts.headlineBold, fontSize: typography.sizes['3xl'], color: palette.darkText.primary, lineHeight: typography.sizes['3xl'] * 1.2 },
   subtitle: { fontFamily: typography.fonts.body, fontSize: typography.sizes.md, color: palette.darkText.secondary, lineHeight: typography.sizes.md * 1.6 },
 
-  card:       { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.md, ...shadows.sm },
-  iconBox:    { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 },
-  icon:       { fontSize: 20, color: palette.white },
-  cardText:   { flex: 1, gap: 3 },
-  difficulty: { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.6 },
-  cardTitle:  { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.primary },
-  tagline:    { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.4 },
-  tags:       { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
-  tag:        { backgroundColor: palette.dark.surface2, borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 2 },
-  tagText:    { fontFamily: typography.fonts.body, fontSize: 10, color: palette.darkText.muted },
-  chevron:    { fontSize: 24, color: palette.darkText.muted, marginTop: 8 },
+  card:        { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, backgroundColor: palette.dark.surface1, borderRadius: radius.xl, padding: spacing.md, ...shadows.sm, borderWidth: 1, borderColor: 'transparent' },
+  cardHovered: { backgroundColor: palette.dark.surface2, borderColor: palette.dark.surface3 },
+  iconBox:     { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 },
+  icon:        { fontSize: 20, color: palette.white },
+  cardText:    { flex: 1, gap: 3 },
+  difficulty:         { fontFamily: typography.fonts.bodyBold, fontSize: typography.sizes.xs, color: palette.softFuchsia, textTransform: 'uppercase', letterSpacing: 0.6 },
+  difficultyHovered:  { color: palette.electricPurple },
+  cardTitle:   { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.primary },
+  tagline:     { fontFamily: typography.fonts.body, fontSize: typography.sizes.sm, color: palette.darkText.secondary, lineHeight: typography.sizes.sm * 1.4 },
+  tags:        { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  tag:         { backgroundColor: palette.dark.surface2, borderRadius: radius.full, paddingHorizontal: 8, paddingVertical: 2 },
+  tagHovered:  { backgroundColor: palette.dark.surface3 },
+  tagText:     { fontFamily: typography.fonts.body, fontSize: 10, color: palette.darkText.muted },
+  chevron:         { fontSize: 24, color: palette.darkText.muted, marginTop: 8 },
+  chevronHovered:  { color: palette.electricPurple },
 
   empty:      { paddingTop: spacing.xl, alignItems: 'center', gap: spacing.sm },
   emptyTitle: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.secondary },
