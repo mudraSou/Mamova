@@ -13,7 +13,6 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { RootNavigator } from '@/navigation';
-import { useAuthStore } from '@/store/authStore';
 import { useProfileStore } from '@/store/profileStore';
 
 SplashScreen.preventAutoHideAsync();
@@ -28,14 +27,9 @@ export default function App() {
     PlusJakartaSans_700Bold,
   });
 
-  const { initialize, session } = useAuthStore();
-  const { fetchProfile }        = useProfileStore();
+  const { initialize } = useProfileStore();
 
   useEffect(() => { initialize(); }, []);
-
-  useEffect(() => {
-    if (session?.user) fetchProfile(session.user.id);
-  }, [session]);
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();

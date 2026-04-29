@@ -66,7 +66,7 @@ export function WelcomeScreen({ navigation }: Props) {
         <Animated.View style={[styles.ctas, { opacity: fadeAnim }]}>
           <Button
             label="Get started"
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate('Onboarding')}
             size="lg"
           />
           <Text style={styles.disclaimer}>

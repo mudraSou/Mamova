@@ -4,14 +4,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { palette, typography, spacing, radius } from '@/theme';
-import { useAuthStore } from '@/store/authStore';
+import { palette, typography } from '@/theme';
 import { useProfileStore } from '@/store/profileStore';
 
 // ── Screen imports ────────────────────────────────────────────────
 import { WelcomeScreen }       from '@/screens/onboarding/WelcomeScreen';
 import { OnboardingScreen }    from '@/screens/onboarding/OnboardingScreen';
-import { LoginScreen }         from '@/screens/auth/LoginScreen';
 import { HomeScreen }          from '@/screens/home/HomeScreen';
 import { SymptomsListScreen }  from '@/screens/symptoms/SymptomsListScreen';
 import { SymptomDetailScreen } from '@/screens/symptoms/SymptomDetailScreen';
@@ -22,7 +20,6 @@ import { CoachScreen }         from '@/screens/coach/CoachScreen';
 // ── Stack param types ─────────────────────────────────────────────
 export type RootStackParams = {
   Welcome: undefined;
-  Login: undefined;
   Onboarding: undefined;
   Main: undefined;
 };
@@ -112,21 +109,18 @@ function MainTabs() {
 }
 
 export function RootNavigator() {
-  const { session, isLoading } = useAuthStore();
-  const { profile }            = useProfileStore();
+  const { profile, isLoading } = useProfileStore();
 
   if (isLoading) return null;
 
   return (
     <NavigationContainer>
       <Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
-        {!session ? (
+        {!profile ? (
           <>
-            <Root.Screen name="Welcome" component={WelcomeScreen} />
-            <Root.Screen name="Login"   component={LoginScreen} />
+            <Root.Screen name="Welcome"    component={WelcomeScreen} />
+            <Root.Screen name="Onboarding" component={OnboardingScreen} />
           </>
-        ) : !profile ? (
-          <Root.Screen name="Onboarding" component={OnboardingScreen} />
         ) : (
           <Root.Screen name="Main" component={MainTabs} />
         )}

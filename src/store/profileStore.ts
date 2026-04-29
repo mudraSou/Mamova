@@ -1,22 +1,59 @@
 import { create } from 'zustand';
-import { supabase, type Profile } from '@/lib/supabase';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 export type DeliveryType = 'vaginal' | 'c-section';
+
+export interface Profile {
+  baby_name: string | null;
+  delivery_date: string;       // ISO date 'YYYY-MM-DD'
+  delivery_type: DeliveryType;
+}
 
 export interface ProfileState {
   profile: Profile | null;
   isLoading: boolean;
-  error: string | null;
 
-  // Actions
-  fetchProfile: (userId: string) => Promise<void>;
-  saveProfile: (data: Omit<Profile, 'id' | 'user_id' | 'created_at'>) => Promise<void>;
-  clearProfile: () => void;
+  initialize: () => Promise<void>;
+  saveProfile: (data: Profile) => Promise<void>;
+  clearProfile: () => Promise<void>;
 
-  // Derived helpers
   dayN: () => number;
   isFirstWeek: () => boolean;
   isCSection: () => boolean;
+}
+
+const PROFILE_KEY = 'mamova_profile';
+
+async function readStored(): Promise<Profile | null> {
+  try {
+    let raw: string | null = null;
+    if (Platform.OS === 'web') {
+      raw = localStorage.getItem(PROFILE_KEY);
+    } else {
+      raw = await SecureStore.getItemAsync(PROFILE_KEY);
+    }
+    return raw ? (JSON.parse(raw) as Profile) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeStored(p: Profile): Promise<void> {
+  const raw = JSON.stringify(p);
+  if (Platform.OS === 'web') {
+    localStorage.setItem(PROFILE_KEY, raw);
+  } else {
+    await SecureStore.setItemAsync(PROFILE_KEY, raw);
+  }
+}
+
+async function deleteStored(): Promise<void> {
+  if (Platform.OS === 'web') {
+    localStorage.removeItem(PROFILE_KEY);
+  } else {
+    await SecureStore.deleteItemAsync(PROFILE_KEY);
+  }
 }
 
 /** Clinical convention: Day 1 = birth day. Exported for unit testing. */
@@ -31,41 +68,23 @@ export function calcDayN(deliveryDate: string, today = new Date()): number {
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
   profile: null,
-  isLoading: false,
-  error: null,
+  isLoading: true,
 
-  fetchProfile: async (userId) => {
-    set({ isLoading: true, error: null });
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      set({ error: error.message, isLoading: false });
-      return;
-    }
-    set({ profile: data ?? null, isLoading: false });
+  initialize: async () => {
+    const profile = await readStored();
+    set({ profile, isLoading: false });
   },
 
   saveProfile: async (data) => {
-    set({ isLoading: true, error: null });
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { set({ error: 'Not authenticated', isLoading: false }); return; }
-
-    const payload = { ...data, user_id: user.id };
-    const { data: saved, error } = await supabase
-      .from('profiles')
-      .upsert(payload, { onConflict: 'user_id' })
-      .select()
-      .single();
-
-    if (error) { set({ error: error.message, isLoading: false }); return; }
-    set({ profile: saved, isLoading: false });
+    set({ isLoading: true });
+    await writeStored(data);
+    set({ profile: data, isLoading: false });
   },
 
-  clearProfile: () => set({ profile: null }),
+  clearProfile: async () => {
+    await deleteStored();
+    set({ profile: null });
+  },
 
   dayN: () => {
     const p = get().profile;
