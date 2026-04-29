@@ -8,36 +8,40 @@ import { palette, typography } from '@/theme';
 import { useProfileStore } from '@/store/profileStore';
 
 // ── Screen imports ────────────────────────────────────────────────
-import { WelcomeScreen }       from '@/screens/onboarding/WelcomeScreen';
-import { OnboardingScreen }    from '@/screens/onboarding/OnboardingScreen';
-import { HomeScreen }          from '@/screens/home/HomeScreen';
-import { SymptomsListScreen }  from '@/screens/symptoms/SymptomsListScreen';
-import { SymptomDetailScreen } from '@/screens/symptoms/SymptomDetailScreen';
-import { PositionsListScreen } from '@/screens/positions/PositionsListScreen';
-import { PositionDetailScreen }from '@/screens/positions/PositionDetailScreen';
-import { CoachScreen }         from '@/screens/coach/CoachScreen';
+import { WelcomeScreen }      from '@/screens/onboarding/WelcomeScreen';
+import { OnboardingScreen }   from '@/screens/onboarding/OnboardingScreen';
+import { JoinScreen }         from '@/screens/onboarding/JoinScreen';
+import { PinRevealScreen }    from '@/screens/onboarding/PinRevealScreen';
+import { HomeScreen }         from '@/screens/home/HomeScreen';
+import { SymptomsListScreen } from '@/screens/symptoms/SymptomsListScreen';
+import { SymptomDetailScreen }from '@/screens/symptoms/SymptomDetailScreen';
+import { PositionsListScreen }from '@/screens/positions/PositionsListScreen';
+import { PositionDetailScreen}from '@/screens/positions/PositionDetailScreen';
+import { CoachScreen }        from '@/screens/coach/CoachScreen';
 
 // ── Stack param types ─────────────────────────────────────────────
 export type RootStackParams = {
-  Welcome: undefined;
+  Welcome:    undefined;
   Onboarding: undefined;
-  Main: undefined;
+  Join:       undefined;
+  PinReveal:  { pin: string };
+  Main:       undefined;
 };
 
 export type MainTabParams = {
-  Home: undefined;
+  Home:      undefined;
   Symptoms:  NavigatorScreenParams<SymptomsStackParams>  | undefined;
   Positions: NavigatorScreenParams<PositionsStackParams> | undefined;
-  Coach: undefined;
+  Coach:     undefined;
 };
 
 export type SymptomsStackParams = {
-  SymptomsList: undefined;
+  SymptomsList:  undefined;
   SymptomDetail: { slug: string };
 };
 
 export type PositionsStackParams = {
-  PositionsList: undefined;
+  PositionsList:  undefined;
   PositionDetail: { slug: string };
 };
 
@@ -46,12 +50,12 @@ const Tab       = createBottomTabNavigator<MainTabParams>();
 const SympStack = createNativeStackNavigator<SymptomsStackParams>();
 const PosStack  = createNativeStackNavigator<PositionsStackParams>();
 
-// ── Tab bar icons (text-based — replace with SVG/icon lib if needed)
+// ── Tab bar icons (text-based)
 const TAB_ICONS: Record<string, { outline: string; filled: string }> = {
-  Home:      { outline: '⌂',  filled: '⌂'  },
-  Symptoms:  { outline: '◎',  filled: '●'  },
-  Positions: { outline: '✦',  filled: '✦'  },
-  Coach:     { outline: '◇',  filled: '◆'  },
+  Home:      { outline: '⌂', filled: '⌂' },
+  Symptoms:  { outline: '◎', filled: '●' },
+  Positions: { outline: '✦', filled: '✦' },
+  Coach:     { outline: '◇', filled: '◆' },
 };
 
 function SymptomsStack() {
@@ -121,6 +125,8 @@ export function RootNavigator() {
           <>
             <Root.Screen name="Welcome"    component={WelcomeScreen} />
             <Root.Screen name="Onboarding" component={OnboardingScreen} />
+            <Root.Screen name="Join"       component={JoinScreen} />
+            <Root.Screen name="PinReveal"  component={PinRevealScreen} />
           </>
         ) : (
           <Root.Screen name="Main" component={MainTabs} />

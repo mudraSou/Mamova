@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import {
-  View, Text, StyleSheet, Animated, Dimensions,
+  View, Text, StyleSheet, Animated, Dimensions, TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -69,8 +69,19 @@ export function WelcomeScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('Onboarding')}
             size="lg"
           />
+
+          {/* Partner join */}
+          <TouchableOpacity
+            style={styles.joinBtn}
+            onPress={() => navigation.navigate('Join')}
+            activeOpacity={0.75}
+          >
+            <Text style={styles.joinBtnText}>Join as partner</Text>
+            <Text style={styles.joinBtnSub}> — enter a shared PIN</Text>
+          </TouchableOpacity>
+
           <Text style={styles.disclaimer}>
-            Free. Private. No data leaves your device until you choose.
+            Private. Your data lives on your device and in a secure cloud — only you and your partner can access it.
           </Text>
         </Animated.View>
       </SafeAreaView>
@@ -160,6 +171,25 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
     gap: spacing.md,
   },
+
+  joinBtn: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  joinBtnText: {
+    fontFamily: typography.fonts.bodySemiBold,
+    fontSize: typography.sizes.sm,
+    color: palette.softFuchsia,
+  },
+  joinBtnSub: {
+    fontFamily: typography.fonts.body,
+    fontSize: typography.sizes.sm,
+    color: palette.darkText.muted,
+  },
+
   disclaimer: {
     fontFamily: typography.fonts.body,
     fontSize: typography.sizes.xs,

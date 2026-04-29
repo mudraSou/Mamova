@@ -1,8 +1,8 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
-import { Platform, AppState } from 'react-native';
+import { Platform } from 'react-native';
 
-// ── Env vars — set in .env or eas.json secrets ────────────────────
+// ── Env vars — inlined by Metro at build time ─────────────────────
 const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL  ?? '';
 const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON ?? '';
 
@@ -26,35 +26,20 @@ const getStorageAdapter = () => {
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: {
     storage: getStorageAdapter(),
-    autoRefreshToken: true,
-    persistSession: true,
+    autoRefreshToken: false,
+    persistSession: false,
     detectSessionInUrl: false,
   },
 });
 
-// ── Keep session alive when app is foregrounded ──────────────────
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
-
-// ── Database types (extend as schema grows) ──────────────────────
-export type Profile = {
-  id: string;
-  user_id: string;
-  baby_name: string | null;
+// ── Database types ────────────────────────────────────────────────
+export type DbProfile = {
+  id:            string;
+  pin:           string;
+  mother_name:   string | null;
+  partner_name:  string | null;
+  baby_name:     string | null;
   delivery_date: string;       // ISO date 'YYYY-MM-DD'
   delivery_type: 'vaginal' | 'c-section';
-  created_at: string;
-};
-
-export type Bookmark = {
-  id: string;
-  user_id: string;
-  content_type: 'symptom' | 'position';
-  content_slug: string;
-  created_at: string;
+  created_at:    string;
 };

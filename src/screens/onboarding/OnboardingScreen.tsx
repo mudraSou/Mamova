@@ -5,34 +5,50 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParams } from '@/navigation';
 import { Button } from '@/components/ui/Button';
 import { DatePicker } from '@/components/ui/DatePicker';
 import { useProfileStore } from '@/store/profileStore';
 import { palette, gradients, typography, spacing, radius } from '@/theme';
 
-const STEPS = ['Name', 'Date', 'Type'] as const;
-type Step = 0 | 1 | 2;
+type Props = NativeStackScreenProps<RootStackParams, 'Onboarding'>;
 
-export function OnboardingScreen() {
+const STEPS = ['Mother', 'Partner', 'Baby', 'Date', 'Type'] as const;
+type Step = 0 | 1 | 2 | 3 | 4;
+
+export function OnboardingScreen({ navigation }: Props) {
   const [step, setStep]               = useState<Step>(0);
+  const [motherName, setMotherName]   = useState('');
+  const [partnerName, setPartnerName] = useState('');
   const [babyName, setBabyName]       = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryType, setDeliveryType] = useState<'vaginal' | 'c-section'>('vaginal');
   const [error, setError]             = useState<string | null>(null);
   const { saveProfile, isLoading }    = useProfileStore();
 
-  const today = new Date().toISOString().slice(0, 10);
-
   const advance = () => {
     setError(null);
-    if (step === 1 && !deliveryDate) { setError('Please enter your delivery date.'); return; }
-    if (step < 2) { setStep((step + 1) as Step); return; }
+    if (step === 0 && !motherName.trim()) { setError("Please enter your name."); return; }
+    if (step === 3 && !deliveryDate) { setError('Please select your delivery date.'); return; }
+    if (step < 4) { setStep((step + 1) as Step); return; }
     handleSave();
   };
 
   const handleSave = async () => {
-    if (!deliveryDate) { setError('Please enter your delivery date.'); return; }
-    await saveProfile({ baby_name: babyName || null, delivery_date: deliveryDate, delivery_type: deliveryType });
+    if (!deliveryDate) { setError('Please select your delivery date.'); return; }
+    try {
+      const profile = await saveProfile({
+        mother_name:   motherName.trim() || null,
+        partner_name:  partnerName.trim() || null,
+        baby_name:     babyName.trim()    || null,
+        delivery_date: deliveryDate,
+        delivery_type: deliveryType,
+      });
+      navigation.replace('PinReveal', { pin: profile.pin });
+    } catch (e: any) {
+      setError(e.message ?? 'Something went wrong. Please try again.');
+    }
   };
 
   const progress = ((step + 1) / STEPS.length) * 100;
@@ -51,16 +67,57 @@ export function OnboardingScreen() {
             {/* Step indicator */}
             <Text style={styles.stepLabel}>{step + 1} of {STEPS.length}</Text>
 
-            {/* Step content */}
+            {/* ── Step 0: Mother name ─────────────────────────────── */}
             {step === 0 && (
               <View style={styles.stepBlock}>
+                <Text style={styles.stepTitle}>What's your name?</Text>
+                <Text style={styles.stepSub}>We'll use it to personalise your experience.</Text>
+                <TextInput
+                  style={[styles.input, error ? styles.inputError : null]}
+                  value={motherName}
+                  onChangeText={setMotherName}
+                  placeholder="e.g. Priya"
+                  placeholderTextColor={palette.darkText.muted}
+                  autoFocus
+                  maxLength={60}
+                  returnKeyType="next"
+                  onSubmitEditing={advance}
+                />
+                {error && <Text style={styles.errorText}>{error}</Text>}
+              </View>
+            )}
+
+            {/* ── Step 1: Partner name ────────────────────────────── */}
+            {step === 1 && (
+              <View style={styles.stepBlock}>
+                <Text style={styles.stepTitle}>Your partner's name?</Text>
+                <Text style={styles.stepSub}>
+                  Optional. They can join your profile using a shared PIN — so they always know what you're going through.
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={partnerName}
+                  onChangeText={setPartnerName}
+                  placeholder="e.g. Arjun (optional)"
+                  placeholderTextColor={palette.darkText.muted}
+                  autoFocus
+                  maxLength={60}
+                  returnKeyType="next"
+                  onSubmitEditing={advance}
+                />
+              </View>
+            )}
+
+            {/* ── Step 2: Baby name ───────────────────────────────── */}
+            {step === 2 && (
+              <View style={styles.stepBlock}>
                 <Text style={styles.stepTitle}>What's your baby's name?</Text>
-                <Text style={styles.stepSub}>Optional — we'll use it to personalise your experience.</Text>
+                <Text style={styles.stepSub}>Optional — we'll use it to make things feel personal.</Text>
                 <TextInput
                   style={styles.input}
                   value={babyName}
                   onChangeText={setBabyName}
-                  placeholder="e.g. Meera"
+                  placeholder="e.g. Meera (optional)"
                   placeholderTextColor={palette.darkText.muted}
                   autoFocus
                   maxLength={40}
@@ -70,7 +127,8 @@ export function OnboardingScreen() {
               </View>
             )}
 
-            {step === 1 && (
+            {/* ── Step 3: Delivery date ───────────────────────────── */}
+            {step === 3 && (
               <View style={styles.stepBlock}>
                 <Text style={styles.stepTitle}>When did you deliver?</Text>
                 <Text style={styles.stepSub}>We use this to show what's normal for your stage. Day 1 = your birth day.</Text>
@@ -83,7 +141,8 @@ export function OnboardingScreen() {
               </View>
             )}
 
-            {step === 2 && (
+            {/* ── Step 4: Delivery type ───────────────────────────── */}
+            {step === 4 && (
               <View style={styles.stepBlock}>
                 <Text style={styles.stepTitle}>How did you deliver?</Text>
                 <Text style={styles.stepSub}>This helps us surface the right recovery content for you.</Text>
@@ -102,23 +161,24 @@ export function OnboardingScreen() {
                     </TouchableOpacity>
                   ))}
                 </View>
+                {error && <Text style={styles.errorText}>{error}</Text>}
               </View>
             )}
 
             <Button
-              label={step < 2 ? 'Continue' : 'Let\'s begin'}
+              label={step < 4 ? 'Continue' : "Let's begin"}
               onPress={advance}
               loading={isLoading}
               size="lg"
             />
 
             {step > 0 && (
-              <TouchableOpacity onPress={() => setStep((step - 1) as Step)} style={styles.back}>
+              <TouchableOpacity onPress={() => { setError(null); setStep((step - 1) as Step); }} style={styles.back}>
                 <Text style={styles.backText}>← Back</Text>
               </TouchableOpacity>
             )}
 
-            <Text style={styles.privacy}>🔒 Saved securely on your device.</Text>
+            <Text style={styles.privacy}>🔒 Saved securely on your device and in the cloud.</Text>
 
           </ScrollView>
         </KeyboardAvoidingView>
@@ -131,8 +191,8 @@ const styles = StyleSheet.create({
   safe:   { flex: 1 },
   scroll: { paddingHorizontal: spacing.lg, paddingTop: spacing.md, paddingBottom: spacing['3xl'], gap: spacing.lg },
 
-  progressBar: { height: 4, backgroundColor: palette.dark.surface2, borderRadius: 2, overflow: 'hidden' },
-  progressFill:{ height: '100%', backgroundColor: palette.softFuchsia, borderRadius: 2 },
+  progressBar:  { height: 4, backgroundColor: palette.dark.surface2, borderRadius: 2, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: palette.softFuchsia, borderRadius: 2 },
 
   stepLabel: { fontFamily: typography.fonts.body, fontSize: typography.sizes.xs, color: palette.darkText.muted, textTransform: 'uppercase', letterSpacing: 1 },
 
@@ -163,9 +223,9 @@ const styles = StyleSheet.create({
     borderWidth: 2, borderColor: 'transparent',
   },
   typeCardActive: { borderColor: palette.electricPurple, backgroundColor: palette.dark.surface2 },
-  typeEmoji: { fontSize: 32 },
-  typeLabel: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.secondary },
-  typeLabelActive: { color: palette.lightBlush },
+  typeEmoji:      { fontSize: 32 },
+  typeLabel:      { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.md, color: palette.darkText.secondary },
+  typeLabelActive:{ color: palette.lightBlush },
 
   back:     { alignSelf: 'center', paddingVertical: spacing.sm },
   backText: { fontFamily: typography.fonts.bodySemiBold, fontSize: typography.sizes.sm, color: palette.softFuchsia },
